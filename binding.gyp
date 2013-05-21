@@ -10,18 +10,21 @@
         "src/create_torrent.cpp",
         "src/entry.cpp",
         "src/file_storage.cpp",
-        "src/version.cpp"
+        "src/session.cpp"
+      ],
+      "cflags_cc": [
+        "-fPIC",
+        "`pkg-config --cflags libtorrent-rasterbar`"
+      ],
+      "cflags_cc!": [
+        "-fno-exceptions"
+      ],
+      "ldflags": [],
+      "libraries": [
+        "`pkg-config --libs libtorrent-rasterbar`"
       ],
       "conditions": [
-        ["OS=='linux'", {
-          "cflags": [
-            "-fPIC",
-            "`pkg-config --cflags libtorrent-rasterbar`"
-          ],
-          "ldflags": [],
-          "libraries": [
-            "`pkg-config --libs libtorrent-rasterbar`"
-          ]
+        ["OS=='linux'", {  
         }]
       ]
     }

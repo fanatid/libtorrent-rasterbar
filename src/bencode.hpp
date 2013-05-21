@@ -3,7 +3,8 @@
 
 #include <v8.h>
 
-
-void bind_bencode(v8::Handle<v8::Object> target);
+namespace nodelt {
+  v8::Handle<v8::Value> bencode(const v8::Arguments& args);
+};
 
 #endif // NODE_LIBTORRENT_BENCODE_HPP_INCLUDED

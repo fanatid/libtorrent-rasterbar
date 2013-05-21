@@ -4,26 +4,23 @@ describe "file_storage.cpp", ->
   beforeEach ->
     lt = require "../build/Release/libtorrent"
 
-  describe "file_storage class", ->
+  describe "FileStorage", ->
     fs = undefined
 
     beforeEach ->
-      fs = new lt.file_storage()
+      fs = new lt.FileStorage()
 
-    it "constructor", ->
-      expect(lt.file_storage).toBeDefined()
+    it "isValid", ->
+      expect(fs.isValid).toBeDefined()
 
-    it "is_valid method", ->
-      expect(fs.is_valid).toBeDefined()
+    it "numFiles", ->
+      expect(fs.numFiles).toBeDefined()
 
-    it "num_files method", ->
-      expect(fs.num_files).toBeDefined()
+    it "totalSize", ->
+      expect(fs.totalSize).toBeDefined()
 
-    it "total_size method", ->
-      expect(fs.total_size).toBeDefined()
+    it "setNumPieces", ->
+      expect(fs.setNumPieces).toBeDefined()
 
-    it "set_num_pieces method", ->
-      expect(fs.set_num_pieces).toBeDefined()
-
-    it "num_pieces method", ->
-      expect(fs.num_pieces).toBeDefined()
+    it "numPieces", ->
+      expect(fs.numPieces).toBeDefined()
