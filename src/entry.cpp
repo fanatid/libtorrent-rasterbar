@@ -26,6 +26,10 @@ namespace nodelt {
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
     // Prototype
 
+    /*!Entry::
+     * 
+     * [entry in libtorrent documentation](http://www.rasterbar.com/products/libtorrent/manual.html#entry)
+     */
     constructor = Persistent<Function>::New(tpl->GetFunction());
   };
 

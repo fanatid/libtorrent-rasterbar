@@ -24,17 +24,37 @@ namespace nodelt {
     tpl->SetClassName(String::NewSymbol("FileStorage"));
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
     // Prototype
+    /*!FileStorage::isValid
+     * fs.isValid()
+     */
     tpl->PrototypeTemplate()->Set(String::NewSymbol("isValid"),
       FunctionTemplate::New(isValid)->GetFunction());
+    /*!FileStorage::numFiles
+     * fs.numFiles()
+     */
     tpl->PrototypeTemplate()->Set(String::NewSymbol("numFiles"),
       FunctionTemplate::New(numFiles)->GetFunction());
+    /*!FileStorage::totalSize
+     * fs.totalSize()
+     */
     tpl->PrototypeTemplate()->Set(String::NewSymbol("totalSize"),
       FunctionTemplate::New(totalSize)->GetFunction());
+    /*!FileStorage::setNumPieces
+     * fs.setNumPieces(count)
+     */
     tpl->PrototypeTemplate()->Set(String::NewSymbol("setNumPieces"),
       FunctionTemplate::New(setNumPieces)->GetFunction());
+    /*!FileStorage::numPieces
+     * fs.numPieces()
+     */
     tpl->PrototypeTemplate()->Set(String::NewSymbol("numPieces"),
       FunctionTemplate::New(numPieces)->GetFunction());
 
+    /*!FileStorage::
+     * FileStorage()
+     * Returns instance of [FileStorage](#FileStorage::)
+     * [file_storage class in libtorrent documentation](http://www.rasterbar.com/products/libtorrent/make_torrent.html#file-storage)
+     */
     target->Set(String::NewSymbol("FileStorage"),
       Persistent<Function>::New(tpl->GetFunction()));
   };

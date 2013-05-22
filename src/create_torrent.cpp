@@ -27,9 +27,19 @@ namespace nodelt {
     tpl->SetClassName(String::NewSymbol("CreateTorrent"));
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
     // Prototype
+    /*!CreateTorrent::generate
+     * ct.generate()
+     * Returns instance of [Entry](#Entry::)
+     * [create_torrent::generate in libtorrent documentation](http://www.rasterbar.com/products/libtorrent/make_torrent.html#generate)
+     */
     tpl->PrototypeTemplate()->Set(String::NewSymbol("generate"),
       FunctionTemplate::New(generate)->GetFunction());
 
+    /*!CreateTorrent::
+     * CreateTorrent(file_storage)
+     * Return new CreateTorrent object.
+     * [struct create_torrent in libtorrent documentation](http://www.rasterbar.com/products/libtorrent/make_torrent.html#create-torrent)
+     */
     target->Set(String::NewSymbol("CreateTorrent"),
       Persistent<Function>::New(tpl->GetFunction()));
   };

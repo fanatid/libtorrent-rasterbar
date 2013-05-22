@@ -25,6 +25,11 @@ namespace nodelt {
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
     // Prototype
 
+    /*!Session::
+     * Session()
+     * Returns instance of [Session](#Session::)
+     * [session class in libtorrent documentation](http://www.rasterbar.com/products/libtorrent/manual.html#session)
+     */
     target->Set(String::NewSymbol("Session"),
       Persistent<Function>::New(tpl->GetFunction()));
   };
