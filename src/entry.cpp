@@ -10,56 +10,48 @@ using namespace node;
 namespace nodelt {
   Persistent<Function> EntryWrap::constructor;
 
-  EntryWrap::EntryWrap() {
-    entry_ = NULL;
-  };
-
-  EntryWrap::~EntryWrap() {
-    if (entry_ != NULL)
-      delete entry_;
-  };
-
   void EntryWrap::Initialize(Handle<Object> target) {
     // Prepare constructor template
-    Local<FunctionTemplate> tpl = FunctionTemplate::New(New);
-    tpl->SetClassName(String::NewSymbol("Entry"));
+    Local<FunctionTemplate> tpl = FunctionTemplate::New(NewInstance);
+    tpl->SetClassName(String::NewSymbol("entry"));
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
     // Prototype
 
-    /*!Entry::
-     * 
-     * [entry in libtorrent documentation](http://www.rasterbar.com/products/libtorrent/manual.html#entry)
-     */
     constructor = Persistent<Function>::New(tpl->GetFunction());
   };
 
-  bool EntryWrap::IsInstance(Local<Value> obj) {
+  EntryWrap::EntryWrap() {
+    obj_ = NULL;
+  };
+
+  EntryWrap::~EntryWrap() {
+    if (obj_ != NULL)
+      delete obj_;
+  };
+
+  Handle<Value> EntryWrap::NewInstance(const Arguments& args) {
     HandleScope scope;
 
-    if (!obj->IsObject())
-      return false;
-    String::Utf8Value constructor_name(obj->ToObject()->GetConstructorName());
-    if (std::string(*constructor_name) != "Entry")
-      return false;
-    return true;
-  };
-
-  void EntryWrap::create_entry(const libtorrent::entry& entry) {
-    entry_ = new libtorrent::entry(entry);
-  };
-
-  Handle<Value> EntryWrap::New(const Arguments& args) {
     if (!args.IsConstructCall())
       return ThrowException(Exception::TypeError(
         String::New("Use the new operator to create instances of this object.")));
 
-    if (args.Length() != 0)
-      return ThrowException(Exception::Error(
-        String::New("Entry constructor: bad arguments")));
-
     EntryWrap* w = new EntryWrap();
     w->Wrap(args.This());
 
-    return args.This();
+    return scope.Close(args.This());
+  };
+
+  Local<Object> EntryWrap::New(const libtorrent::entry& entry_) {
+    HandleScope scope;
+
+    Local<Object> entry = constructor->NewInstance();
+    ObjectWrap::Unwrap<EntryWrap>(entry)->obj_ = new libtorrent::entry(entry_);
+
+    return scope.Close(entry);
+  };
+
+  void bind_entry(Handle<Object> target) {
+    EntryWrap::Initialize(target);
   };
 }; // namespace nodelt

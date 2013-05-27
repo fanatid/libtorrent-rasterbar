@@ -1,8 +1,8 @@
 lt = require "../build/Release/libtorrent"
 
-fs = new lt.FileStorage()
-lt.addFiles(fs, "./spec")
-ct = new lt.CreateTorrent(fs)
-lt.setPieceHashes ct, "."
+fs = new lt.file_storage()
+lt.add_files fs, "./src"
+ct = new lt.create_torrent(fs)
+lt.set_piece_hashes ct, "."
 t = lt.bencode ct.generate()
 console.log t

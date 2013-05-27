@@ -11,17 +11,21 @@ namespace nodelt {
   class SessionWrap: public node::ObjectWrap {
     public:
       static void Initialize(v8::Handle<v8::Object> target);
-      libtorrent::session* GetWrapped() const { return s_; };
+      libtorrent::session* GetWrapped() const { return obj_; };
 
     private:
       SessionWrap();
       ~SessionWrap();
-      static v8::Handle<v8::Value> New(const v8::Arguments& args);
+      static v8::Handle<v8::Value> NewInstance(const v8::Arguments& args);
 
       // Wrapped methods
+      static v8::Handle<v8::Value> is_listening(const v8::Arguments& args);
+      static v8::Handle<v8::Value> listen_port(const v8::Arguments& args);
+      static v8::Handle<v8::Value> listen_on(const v8::Arguments& args);
+      static v8::Handle<v8::Value> add_torrent(const v8::Arguments& args);
 
       // Wrapped object
-      libtorrent::session* s_;
+      libtorrent::session* obj_;
   };
 };
 

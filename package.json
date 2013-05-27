@@ -17,5 +17,9 @@
   "dependencies": {
     "grunt": ">= 0.4",
     "underscore": ">= 1.0.0"
+  },
+  "scripts": {
+    "install": "node-gyp rebuild",
+    "test": "jasmine-node --coffee spec/"
   }
 }

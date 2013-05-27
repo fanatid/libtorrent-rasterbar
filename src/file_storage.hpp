@@ -11,23 +11,22 @@ namespace nodelt {
   class FileStorageWrap: public node::ObjectWrap {
     public:
       static void Initialize(v8::Handle<v8::Object> target);
-      libtorrent::file_storage* GetWrapped() const { return fs_; };
-      static bool IsInstance(v8::Local<v8::Value> obj);
+      libtorrent::file_storage* GetWrapped() const { return obj_; };
 
     private:
       FileStorageWrap();
       ~FileStorageWrap();
-      static v8::Handle<v8::Value> New(const v8::Arguments& args);
+      static v8::Handle<v8::Value> NewInstance(const v8::Arguments& args);
 
       // Wrapped methods
-      static v8::Handle<v8::Value> isValid(const v8::Arguments& args);
-      static v8::Handle<v8::Value> numFiles(const v8::Arguments& args);
-      static v8::Handle<v8::Value> totalSize(const v8::Arguments& args);
-      static v8::Handle<v8::Value> setNumPieces(const v8::Arguments& args);
-      static v8::Handle<v8::Value> numPieces(const v8::Arguments& args);
+      static v8::Handle<v8::Value> is_valid(const v8::Arguments& args);
+      static v8::Handle<v8::Value> num_files(const v8::Arguments& args);
+      static v8::Handle<v8::Value> total_size(const v8::Arguments& args);
+      static v8::Handle<v8::Value> set_num_pieces(const v8::Arguments& args);
+      static v8::Handle<v8::Value> num_pieces(const v8::Arguments& args);
 
       // Wrapped object
-      libtorrent::file_storage* fs_;
+      libtorrent::file_storage* obj_;
   };
 };
 
