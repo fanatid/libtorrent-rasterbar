@@ -11,7 +11,9 @@ namespace nodelt {
   class FileStorageWrap: public node::ObjectWrap {
     public:
       static void Initialize(v8::Handle<v8::Object> target);
-      libtorrent::file_storage* GetWrapped() const { return obj_; };
+      static libtorrent::file_storage* Unwrap(v8::Local<v8::Object> const& obj) {
+        return node::ObjectWrap::Unwrap<FileStorageWrap>(obj)->obj_;
+      };
 
     private:
       FileStorageWrap();

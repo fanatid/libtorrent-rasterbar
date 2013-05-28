@@ -19,8 +19,7 @@ namespace nodelt {
     // ti
     if (obj->Has(String::NewSymbol("ti"))) {
       Local<Object> ti = obj->Get(String::NewSymbol("ti"))->ToObject();
-      p.ti = new libtorrent::torrent_info(
-        *ObjectWrap::Unwrap<TorrentInfoWrap>(ti)->GetWrapped());
+      p.ti = new libtorrent::torrent_info(*TorrentInfoWrap::Unwrap(ti));
     }
 
     // trackers

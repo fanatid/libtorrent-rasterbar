@@ -58,27 +58,26 @@ namespace nodelt {
   SessionWrap::SessionWrap(Local<Array> args) {
     int args_len = args->Length();
     if (args_len >= 1 && args_len <= 5) {
-      libtorrent::fingerprint* print_;
-      print_ = ObjectWrap::Unwrap<FingerprintWrap>(args->Get(0)->ToObject())->GetWrapped();
+      libtorrent::fingerprint* print_ = FingerprintWrap::Unwrap(args->Get(0)->ToObject());
       if (args_len == 1) {
         obj_ = new libtorrent::session(*print_);
         return;
       }
       if (args->Get(1)->IsArray()) {
-        Local<Array> arg1 = Array::Cast(*args->Get(0));
+        Local<Array> pr = Array::Cast(*args->Get(0));
         std::pair<int, int> port_range = std::make_pair(
-          arg1->Get(0)->IntegerValue(), arg1->Get(1)->IntegerValue());
+          pr->Get(0)->IntegerValue(), pr->Get(1)->IntegerValue());
         if (args_len == 2) {
           obj_ = new libtorrent::session(*print_, port_range);
           return;
         }
-        std::string lif(*String::AsciiValue(args->Get(2)->ToString()));
+        std::string interface(*String::AsciiValue(args->Get(2)->ToString()));
         if (args_len == 3)
-          obj_ = new libtorrent::session(*print_, port_range, lif.c_str());
+          obj_ = new libtorrent::session(*print_, port_range, interface.c_str());
         else if (args_len == 4)
-          obj_ = new libtorrent::session(*print_, port_range, lif.c_str(), args->Get(3)->Int32Value());
+          obj_ = new libtorrent::session(*print_, port_range, interface.c_str(), args->Get(3)->Int32Value());
         else
-          obj_ = new libtorrent::session(*print_, port_range, lif.c_str(), args->Get(3)->Int32Value(), args->Get(4)->Int32Value());
+          obj_ = new libtorrent::session(*print_, port_range, interface.c_str(), args->Get(3)->Int32Value(), args->Get(4)->Int32Value());
       } else {
         if (args_len == 2)
           obj_ = new libtorrent::session(*print_, args->Get(1)->Int32Value());
@@ -113,25 +112,22 @@ namespace nodelt {
   Handle<Value> SessionWrap::save_state(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::session* s_;
-    s_ = ObjectWrap::Unwrap<SessionWrap>(args.This())->GetWrapped();
-    libtorrent::entry e_;
+    libtorrent::session* s = SessionWrap::Unwrap(args.This());
+    libtorrent::entry e;
     if (args.Length() == 1)
-      s_->save_state(e_, args[0]->IntegerValue());
+      s->save_state(e, args[0]->IntegerValue());
     else
-      s_->save_state(e_);
+      s->save_state(e);
 
-    return scope.Close(entry_to_object(e_));
+    return scope.Close(entry_to_object(e));
   };
 
   Handle<Value> SessionWrap::load_state(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::session* s_;
-    s_ = ObjectWrap::Unwrap<SessionWrap>(args.This())->GetWrapped();
-    libtorrent::entry e_ = entry_from_object(args[0]);
     // deprecated! need lazy_entry...
-    s_->load_state(e_);
+    libtorrent::entry e = entry_from_object(args[0]);
+    SessionWrap::Unwrap(args.This())->load_state(e);
 
     return scope.Close(Undefined());
   };
@@ -139,21 +135,19 @@ namespace nodelt {
   Handle<Value> SessionWrap::add_torrent(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::session* s_;
-    s_ = ObjectWrap::Unwrap<SessionWrap>(args.This())->GetWrapped();
-    libtorrent::torrent_handle th_;
-    libtorrent::error_code ec_;
-    th_ = s_->add_torrent(add_torrent_params_from_object(args[0]->ToObject()), ec_);
+    libtorrent::torrent_handle th;
+    libtorrent::add_torrent_params p = add_torrent_params_from_object(args[0]->ToObject());
+    libtorrent::error_code ec;
+    th = SessionWrap::Unwrap(args.This())->add_torrent(p, ec);
 
-    return scope.Close(TorrentHandleWrap::New(th_));
+    return scope.Close(TorrentHandleWrap::New(th));
   };
 
   Handle<Value> SessionWrap::async_add_torrent(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::session* s_;
-    s_ = ObjectWrap::Unwrap<SessionWrap>(args.This())->GetWrapped();
-    s_->async_add_torrent(add_torrent_params_from_object(args[0]->ToObject()));
+    libtorrent::add_torrent_params p = add_torrent_params_from_object(args[0]->ToObject());
+    SessionWrap::Unwrap(args.This())->async_add_torrent(p);
 
     return scope.Close(Undefined());
   };
@@ -161,9 +155,7 @@ namespace nodelt {
   Handle<Value> SessionWrap::pause(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::session* s_;
-    s_ = ObjectWrap::Unwrap<SessionWrap>(args.This())->GetWrapped();
-    s_->pause();
+    SessionWrap::Unwrap(args.This())->pause();
 
     return scope.Close(Undefined());
   };
@@ -171,9 +163,7 @@ namespace nodelt {
   Handle<Value> SessionWrap::resume(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::session* s_;
-    s_ = ObjectWrap::Unwrap<SessionWrap>(args.This())->GetWrapped();
-    s_->resume();
+    SessionWrap::Unwrap(args.This())->resume();
     
     return scope.Close(Undefined());
   };
@@ -181,48 +171,44 @@ namespace nodelt {
   Handle<Value> SessionWrap::is_paused(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::session* s_;
-    s_ = ObjectWrap::Unwrap<SessionWrap>(args.This())->GetWrapped();
+    libtorrent::session* s = SessionWrap::Unwrap(args.This());
 
-    return scope.Close(Boolean::New(s_->is_paused()));
+    return scope.Close(Boolean::New(s->is_paused()));
   };
 
   Handle<Value> SessionWrap::is_listening(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::session* s_;
-    s_ = ObjectWrap::Unwrap<SessionWrap>(args.This())->GetWrapped();
+    libtorrent::session* s = SessionWrap::Unwrap(args.This());
 
-    return scope.Close(Boolean::New(s_->is_listening()));
+    return scope.Close(Boolean::New(s->is_listening()));
   };
 
   Handle<Value> SessionWrap::listen_port(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::session* s_;
-    s_ = ObjectWrap::Unwrap<SessionWrap>(args.This())->GetWrapped();
+    libtorrent::session* s = SessionWrap::Unwrap(args.This());
 
-    return scope.Close(Integer::New(s_->listen_port()));
+    return scope.Close(Integer::New(s->listen_port()));
   };
 
   Handle<Value> SessionWrap::listen_on(const Arguments& args) {
     HandleScope scope;
 
-    Local<Array> arg0 = Array::Cast(*args[0]);
+    Local<Array> pr = Array::Cast(*args[0]);
     std::pair<int, int> port_range = std::make_pair(
-      arg0->Get(0)->IntegerValue(), arg0->Get(1)->IntegerValue());
-    libtorrent::error_code ec_;
-    libtorrent::session* s_;
-    s_ = ObjectWrap::Unwrap<SessionWrap>(args.This())->GetWrapped();
+      pr->Get(0)->IntegerValue(), pr->Get(1)->IntegerValue());
+    libtorrent::error_code ec;
+    libtorrent::session* s = SessionWrap::Unwrap(args.This());
 
     if (args.Length() == 1) {
-      s_->listen_on(port_range, ec_);
+      s->listen_on(port_range, ec);
     } else {
-      std::string lif(*String::AsciiValue(args[1]->ToString()));
+      std::string interface(*String::AsciiValue(args[1]->ToString()));
       if (args.Length() == 2) {
-        s_->listen_on(port_range, ec_, lif.c_str());
+        s->listen_on(port_range, ec, interface.c_str());
       } else {
-        s_->listen_on(port_range, ec_, lif.c_str(), args[2]->Int32Value());
+        s->listen_on(port_range, ec, interface.c_str(), args[2]->Int32Value());
       }
     }
 

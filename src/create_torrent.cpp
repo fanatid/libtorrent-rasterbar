@@ -42,8 +42,7 @@ namespace nodelt {
       return ThrowException(Exception::TypeError(
         String::New("Use the new operator to create instances of this object.")));
 
-    FileStorageWrap* fs = ObjectWrap::Unwrap<FileStorageWrap>(args[0]->ToObject());
-    CreateTorrentWrap* ct = new CreateTorrentWrap(*fs->GetWrapped());
+    CreateTorrentWrap* ct = new CreateTorrentWrap(*FileStorageWrap::Unwrap(args[0]->ToObject()));
     ct->Wrap(args.This());
 
     return scope.Close(args.This());
@@ -52,24 +51,21 @@ namespace nodelt {
   Handle<Value> CreateTorrentWrap::generate(const Arguments& args) {
     HandleScope scope;
 
-    CreateTorrentWrap* ct = ObjectWrap::Unwrap<CreateTorrentWrap>(args.This());
-    libtorrent::entry entry_ = ct->GetWrapped()->generate();
+    libtorrent::entry e = CreateTorrentWrap::Unwrap(args.This())->generate();
 
-    return scope.Close(entry_to_object(entry_));
+    return scope.Close(entry_to_object(e));
   };
 
   Handle<Value> add_files(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::file_storage* fs_;
-    std::string path;
+    libtorrent::file_storage* fs = FileStorageWrap::Unwrap(args[0]->ToObject());
+    std::string path(*String::Utf8Value(args[1]->ToString()));
 
-    fs_ = ObjectWrap::Unwrap<FileStorageWrap>(args[0]->ToObject())->GetWrapped();
-    path = std::string(*String::Utf8Value(args[1]->ToString()));
     if (args.Length() == 2)
-      libtorrent::add_files(*fs_, path);
+      libtorrent::add_files(*fs, path);
     else
-      libtorrent::add_files(*fs_, path, args[2]->ToUint32()->Value());
+      libtorrent::add_files(*fs, path, args[2]->ToUint32()->Value());
 
     return scope.Close(Undefined());
   };
@@ -77,13 +73,11 @@ namespace nodelt {
   Handle<Value> set_piece_hashes(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::create_torrent* ct_;
-    std::string path;
-    libtorrent::error_code ec_;
+    libtorrent::create_torrent* ct = CreateTorrentWrap::Unwrap(args[0]->ToObject());
+    std::string path(*String::Utf8Value(args[1]->ToString()));
+    libtorrent::error_code ec;
 
-    ct_ = ObjectWrap::Unwrap<CreateTorrentWrap>(args[0]->ToObject())->GetWrapped();
-    path = std::string(*String::Utf8Value(args[1]->ToString()));
-    libtorrent::set_piece_hashes(*ct_, path, ec_);
+    libtorrent::set_piece_hashes(*ct, path, ec);
 
     return scope.Close(Undefined());
   };

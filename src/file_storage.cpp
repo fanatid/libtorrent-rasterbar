@@ -55,36 +55,32 @@ namespace nodelt {
   Handle<Value> FileStorageWrap::is_valid(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::file_storage* fs_;
-    fs_ = ObjectWrap::Unwrap<FileStorageWrap>(args.This())->GetWrapped();
+    libtorrent::file_storage* fs = FileStorageWrap::Unwrap(args.This());
 
-    return scope.Close(Boolean::New(fs_->is_valid()));
+    return scope.Close(Boolean::New(fs->is_valid()));
   };
 
   Handle<Value> FileStorageWrap::num_files(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::file_storage* fs_;
-    fs_ = ObjectWrap::Unwrap<FileStorageWrap>(args.This())->GetWrapped();
+    libtorrent::file_storage* fs = FileStorageWrap::Unwrap(args.This());
 
-    return scope.Close(Integer::New(fs_->num_files()));
+    return scope.Close(Integer::New(fs->num_files()));
   };
 
   Handle<Value> FileStorageWrap::total_size(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::file_storage* fs_;
-    fs_ = ObjectWrap::Unwrap<FileStorageWrap>(args.This())->GetWrapped();
+    libtorrent::file_storage* fs = FileStorageWrap::Unwrap(args.This());
 
-    return scope.Close(Integer::New(fs_->total_size()));
+    return scope.Close(Integer::New(fs->total_size()));
   };
 
   Handle<Value> FileStorageWrap::set_num_pieces(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::file_storage* fs_;
-    fs_ = ObjectWrap::Unwrap<FileStorageWrap>(args.This())->GetWrapped();
-    fs_->set_num_pieces(args[0]->IntegerValue());
+    libtorrent::file_storage* fs = FileStorageWrap::Unwrap(args.This());
+    fs->set_num_pieces(args[0]->IntegerValue());
 
     return scope.Close(Undefined());
   };
@@ -92,11 +88,11 @@ namespace nodelt {
   Handle<Value> FileStorageWrap::num_pieces(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::file_storage* fs_;
-    fs_ = ObjectWrap::Unwrap<FileStorageWrap>(args.This())->GetWrapped();
+    libtorrent::file_storage* fs = FileStorageWrap::Unwrap(args.This());
 
-    return scope.Close(Integer::New(fs_->num_pieces()));
+    return scope.Close(Integer::New(fs->num_pieces()));
   };
+
 
   void bind_file_storage(Handle<Object> target) {
     FileStorageWrap::Initialize(target);

@@ -11,7 +11,9 @@ namespace nodelt {
   class SessionWrap: public node::ObjectWrap {
     public:
       static void Initialize(v8::Handle<v8::Object> target);
-      libtorrent::session* GetWrapped() const { return obj_; };
+      static libtorrent::session* Unwrap(v8::Local<v8::Object> const& obj) {
+        return node::ObjectWrap::Unwrap<SessionWrap>(obj)->obj_;
+      };
 
     private:
       SessionWrap(v8::Local<v8::Array> args = v8::Array::New());

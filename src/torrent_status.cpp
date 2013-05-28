@@ -13,134 +13,140 @@ using namespace node;
 
 
 namespace nodelt {
-  Local<Array> bitfield_to_array(libtorrent::bitfield& bf_) {
-    Local<Array> ret = Array::New();
-    for (libtorrent::bitfield::const_iterator i(bf_.begin()), e(bf_.end()); i != e; ++i)
-      ret->Set(ret->Length(), Boolean::New(*i));
-    return ret;
+  Local<Array> bitfield_to_array(libtorrent::bitfield& bf) {
+    HandleScope scope;
+
+    Local<Array> obj = Array::New();
+    for (libtorrent::bitfield::const_iterator i(bf.begin()), e(bf.end()); i != e; ++i)
+      obj->Set(obj->Length(), Boolean::New(*i));
+
+    return scope.Close(obj);
   };
 
   Local<Object> time_duration_to_object(boost::posix_time::time_duration& td) {
-    Local<Object> ret = Object::New();
-    ret->Set(String::NewSymbol("seconds"),      Integer::New(td.total_seconds()));
-    ret->Set(String::NewSymbol("milliseconds"), Integer::New(td.total_milliseconds()));
-    ret->Set(String::NewSymbol("microseconds"), Integer::New(td.total_microseconds()));
-    return ret;
+    HandleScope scope;
+
+    Local<Object> obj = Object::New();
+    obj->Set(String::NewSymbol("seconds"),      Integer::New(td.total_seconds()));
+    obj->Set(String::NewSymbol("milliseconds"), Integer::New(td.total_milliseconds()));
+    obj->Set(String::NewSymbol("microseconds"), Integer::New(td.total_microseconds()));
+
+    return scope.Close(obj);
   };
 
-  Handle<Value> torrent_status_to_object(libtorrent::torrent_status& st_) {
+  Handle<Value> torrent_status_to_object(libtorrent::torrent_status& st) {
     HandleScope scope;
-    Local<Object> st = Object::New();
+    Local<Object> obj = Object::New();
 
-    st->Set(String::NewSymbol("handle"), TorrentHandleWrap::New(st_.handle));
+    obj->Set(String::NewSymbol("handle"), TorrentHandleWrap::New(st.handle));
 
-    st->Set(String::NewSymbol("state"), Integer::New(st_.state));
-    st->Set(String::NewSymbol("paused"), Boolean::New(st_.paused));
-    st->Set(String::NewSymbol("auto_managed"), Boolean::New(st_.auto_managed));
-    st->Set(String::NewSymbol("sequential_download"), Boolean::New(st_.sequential_download));
-    st->Set(String::NewSymbol("seeding"), Boolean::New(st_.seeding));
-    st->Set(String::NewSymbol("finished"), Boolean::New(st_.finished));
-    st->Set(String::NewSymbol("progress"), Number::New(st_.progress));
-    st->Set(String::NewSymbol("progressPpm"), Integer::New(st_.progress_ppm));
-    st->Set(String::NewSymbol("error"), String::New(st_.error.c_str()));
+    obj->Set(String::NewSymbol("state"), Integer::New(st.state));
+    obj->Set(String::NewSymbol("paused"), Boolean::New(st.paused));
+    obj->Set(String::NewSymbol("auto_managed"), Boolean::New(st.auto_managed));
+    obj->Set(String::NewSymbol("sequential_download"), Boolean::New(st.sequential_download));
+    obj->Set(String::NewSymbol("seeding"), Boolean::New(st.seeding));
+    obj->Set(String::NewSymbol("finished"), Boolean::New(st.finished));
+    obj->Set(String::NewSymbol("progress"), Number::New(st.progress));
+    obj->Set(String::NewSymbol("progressPpm"), Integer::New(st.progress_ppm));
+    obj->Set(String::NewSymbol("error"), String::New(st.error.c_str()));
 
-    st->Set(String::NewSymbol("next_announce"), time_duration_to_object(st_.next_announce));
-    st->Set(String::NewSymbol("announce_interval"), time_duration_to_object(st_.announce_interval));
+    obj->Set(String::NewSymbol("next_announce"), time_duration_to_object(st.next_announce));
+    obj->Set(String::NewSymbol("announce_interval"), time_duration_to_object(st.announce_interval));
 
-    st->Set(String::NewSymbol("current_tracker"), String::New(st_.current_tracker.c_str()));
+    obj->Set(String::NewSymbol("current_tracker"), String::New(st.current_tracker.c_str()));
 
-    st->Set(String::NewSymbol("total_download"), Uint32::NewFromUnsigned(st_.total_download));
-    st->Set(String::NewSymbol("total_upload"), Uint32::NewFromUnsigned(st_.total_upload));
+    obj->Set(String::NewSymbol("total_download"), Uint32::NewFromUnsigned(st.total_download));
+    obj->Set(String::NewSymbol("total_upload"), Uint32::NewFromUnsigned(st.total_upload));
 
-    st->Set(String::NewSymbol("total_payload_download"), Uint32::NewFromUnsigned(st_.total_payload_download));
-    st->Set(String::NewSymbol("total_payload_upload"), Uint32::NewFromUnsigned(st_.total_payload_upload));
+    obj->Set(String::NewSymbol("total_payload_download"), Uint32::NewFromUnsigned(st.total_payload_download));
+    obj->Set(String::NewSymbol("total_payload_upload"), Uint32::NewFromUnsigned(st.total_payload_upload));
 
-    st->Set(String::NewSymbol("total_failed_bytes"), Uint32::NewFromUnsigned(st_.total_failed_bytes));
-    st->Set(String::NewSymbol("total_redundant_bytes"), Uint32::NewFromUnsigned(st_.total_redundant_bytes));
+    obj->Set(String::NewSymbol("total_failed_bytes"), Uint32::NewFromUnsigned(st.total_failed_bytes));
+    obj->Set(String::NewSymbol("total_redundant_bytes"), Uint32::NewFromUnsigned(st.total_redundant_bytes));
 
-    st->Set(String::NewSymbol("download_rate"), Integer::New(st_.download_rate));
-    st->Set(String::NewSymbol("upload_rate"), Integer::New(st_.upload_rate));
+    obj->Set(String::NewSymbol("download_rate"), Integer::New(st.download_rate));
+    obj->Set(String::NewSymbol("upload_rate"), Integer::New(st.upload_rate));
 
-    st->Set(String::NewSymbol("download_payload_rate"), Integer::New(st_.download_payload_rate));
-    st->Set(String::NewSymbol("upload_payload_rate"), Integer::New(st_.upload_payload_rate));
+    obj->Set(String::NewSymbol("download_payload_rate"), Integer::New(st.download_payload_rate));
+    obj->Set(String::NewSymbol("upload_payload_rate"), Integer::New(st.upload_payload_rate));
 
-    st->Set(String::NewSymbol("num_peers"), Integer::New(st_.num_peers));
+    obj->Set(String::NewSymbol("num_peers"), Integer::New(st.num_peers));
 
-    st->Set(String::NewSymbol("num_complete"), Integer::New(st_.num_complete));
-    st->Set(String::NewSymbol("num_incomplete"), Integer::New(st_.num_incomplete));
+    obj->Set(String::NewSymbol("num_complete"), Integer::New(st.num_complete));
+    obj->Set(String::NewSymbol("num_incomplete"), Integer::New(st.num_incomplete));
 
-    st->Set(String::NewSymbol("list_seeds"), Integer::New(st_.list_seeds));
-    st->Set(String::NewSymbol("list_peers"), Integer::New(st_.list_peers));
+    obj->Set(String::NewSymbol("list_seeds"), Integer::New(st.list_seeds));
+    obj->Set(String::NewSymbol("list_peers"), Integer::New(st.list_peers));
 
-    st->Set(String::NewSymbol("connect_candidates"), Integer::New(st_.connect_candidates));
+    obj->Set(String::NewSymbol("connect_candidates"), Integer::New(st.connect_candidates));
 
-    st->Set(String::NewSymbol("pieces"), bitfield_to_array(st_.pieces));
-    st->Set(String::NewSymbol("verified_pieces"), bitfield_to_array(st_.verified_pieces));
+    obj->Set(String::NewSymbol("pieces"), bitfield_to_array(st.pieces));
+    obj->Set(String::NewSymbol("verified_pieces"), bitfield_to_array(st.verified_pieces));
 
-    st->Set(String::NewSymbol("num_pieces"), Integer::New(st_.num_pieces));
+    obj->Set(String::NewSymbol("num_pieces"), Integer::New(st.num_pieces));
 
-    st->Set(String::NewSymbol("total_done"), Uint32::NewFromUnsigned(st_.total_done));
-    st->Set(String::NewSymbol("total_wanted_done"), Uint32::NewFromUnsigned(st_.total_wanted_done));
-    st->Set(String::NewSymbol("total_wanted"), Uint32::NewFromUnsigned(st_.total_wanted));
+    obj->Set(String::NewSymbol("total_done"), Uint32::NewFromUnsigned(st.total_done));
+    obj->Set(String::NewSymbol("total_wanted_done"), Uint32::NewFromUnsigned(st.total_wanted_done));
+    obj->Set(String::NewSymbol("total_wanted"), Uint32::NewFromUnsigned(st.total_wanted));
 
-    st->Set(String::NewSymbol("num_seeds"), Integer::New(st_.num_seeds));
+    obj->Set(String::NewSymbol("num_seeds"), Integer::New(st.num_seeds));
 
-    st->Set(String::NewSymbol("distributed_full_copies"), Integer::New(st_.distributed_full_copies));
-    st->Set(String::NewSymbol("distributed_fraction"), Integer::New(st_.distributed_fraction));
+    obj->Set(String::NewSymbol("distributed_full_copies"), Integer::New(st.distributed_full_copies));
+    obj->Set(String::NewSymbol("distributed_fraction"), Integer::New(st.distributed_fraction));
 
-    st->Set(String::NewSymbol("distributed_copies"), Number::New(st_.distributed_copies));
+    obj->Set(String::NewSymbol("distributed_copies"), Number::New(st.distributed_copies));
 
-    st->Set(String::NewSymbol("block_size"), Integer::New(st_.block_size));
+    obj->Set(String::NewSymbol("block_size"), Integer::New(st.block_size));
 
-    st->Set(String::NewSymbol("num_uploads"), Integer::New(st_.num_uploads));
-    st->Set(String::NewSymbol("num_connections"), Integer::New(st_.num_connections));
-    st->Set(String::NewSymbol("uploads_limit"), Integer::New(st_.uploads_limit));
-    st->Set(String::NewSymbol("connections_limit"), Integer::New(st_.connections_limit));
+    obj->Set(String::NewSymbol("num_uploads"), Integer::New(st.num_uploads));
+    obj->Set(String::NewSymbol("num_connections"), Integer::New(st.num_connections));
+    obj->Set(String::NewSymbol("uploads_limit"), Integer::New(st.uploads_limit));
+    obj->Set(String::NewSymbol("connections_limit"), Integer::New(st.connections_limit));
 
-    st->Set(String::NewSymbol("storage_mode"), Integer::New(st_.storage_mode));
+    obj->Set(String::NewSymbol("storage_mode"), Integer::New(st.storage_mode));
 
-    st->Set(String::NewSymbol("up_bandwidth_queue"), Integer::New(st_.up_bandwidth_queue));
-    st->Set(String::NewSymbol("down_bandwidth_queue"), Integer::New(st_.down_bandwidth_queue));
+    obj->Set(String::NewSymbol("up_bandwidth_queue"), Integer::New(st.up_bandwidth_queue));
+    obj->Set(String::NewSymbol("down_bandwidth_queue"), Integer::New(st.down_bandwidth_queue));
 
-    st->Set(String::NewSymbol("all_time_upload"), Uint32::NewFromUnsigned(st_.all_time_upload));
-    st->Set(String::NewSymbol("all_time_download"), Uint32::NewFromUnsigned(st_.all_time_download));
+    obj->Set(String::NewSymbol("all_time_upload"), Uint32::NewFromUnsigned(st.all_time_upload));
+    obj->Set(String::NewSymbol("all_time_download"), Uint32::NewFromUnsigned(st.all_time_download));
 
-    st->Set(String::NewSymbol("active_time"), Integer::New(st_.active_time));
-    st->Set(String::NewSymbol("finished_time"), Integer::New(st_.finished_time));
-    st->Set(String::NewSymbol("seeding_time"), Integer::New(st_.seeding_time));
+    obj->Set(String::NewSymbol("active_time"), Integer::New(st.active_time));
+    obj->Set(String::NewSymbol("finished_time"), Integer::New(st.finished_time));
+    obj->Set(String::NewSymbol("seeding_time"), Integer::New(st.seeding_time));
 
-    st->Set(String::NewSymbol("seed_rank"), Integer::New(st_.seed_rank));
+    obj->Set(String::NewSymbol("seed_rank"), Integer::New(st.seed_rank));
 
-    st->Set(String::NewSymbol("last_scrape"), Integer::New(st_.last_scrape));
+    obj->Set(String::NewSymbol("last_scrape"), Integer::New(st.last_scrape));
 
-    st->Set(String::NewSymbol("has_incoming"), Boolean::New(st_.has_incoming));
+    obj->Set(String::NewSymbol("has_incoming"), Boolean::New(st.has_incoming));
 
-    st->Set(String::NewSymbol("sparse_regions"), Integer::New(st_.sparse_regions));
+    obj->Set(String::NewSymbol("sparse_regions"), Integer::New(st.sparse_regions));
 
-    st->Set(String::NewSymbol("seed_mode"), Boolean::New(st_.seed_mode));
-    st->Set(String::NewSymbol("upload_mode"), Boolean::New(st_.upload_mode));
-    st->Set(String::NewSymbol("share_mode"), Boolean::New(st_.share_mode));
-    st->Set(String::NewSymbol("super_seeding"), Boolean::New(st_.super_seeding));
+    obj->Set(String::NewSymbol("seed_mode"), Boolean::New(st.seed_mode));
+    obj->Set(String::NewSymbol("upload_mode"), Boolean::New(st.upload_mode));
+    obj->Set(String::NewSymbol("share_mode"), Boolean::New(st.share_mode));
+    obj->Set(String::NewSymbol("super_seeding"), Boolean::New(st.super_seeding));
 
-    st->Set(String::NewSymbol("priority"), Integer::New(st_.priority));
+    obj->Set(String::NewSymbol("priority"), Integer::New(st.priority));
 
-    st->Set(String::NewSymbol("added_time"), Date::New(((double) st_.added_time)*1000));
-    st->Set(String::NewSymbol("completed_time"), Date::New(((double) st_.completed_time)*1000));
-    st->Set(String::NewSymbol("last_seen_complete"), Date::New(((double) st_.last_seen_complete)*1000));
+    obj->Set(String::NewSymbol("added_time"), Date::New(((double) st.added_time)*1000));
+    obj->Set(String::NewSymbol("completed_time"), Date::New(((double) st.completed_time)*1000));
+    obj->Set(String::NewSymbol("last_seen_complete"), Date::New(((double) st.last_seen_complete)*1000));
 
-    st->Set(String::NewSymbol("time_since_upload"), Integer::New(st_.time_since_upload));
-    st->Set(String::NewSymbol("time_since_download"), Integer::New(st_.time_since_download));
+    obj->Set(String::NewSymbol("time_since_upload"), Integer::New(st.time_since_upload));
+    obj->Set(String::NewSymbol("time_since_download"), Integer::New(st.time_since_download));
 
-    st->Set(String::NewSymbol("queue_position"), Integer::New(st_.queue_position));
-    st->Set(String::NewSymbol("need_save_resume"), Boolean::New(st_.need_save_resume));
-    st->Set(String::NewSymbol("ip_filter_applies"), Boolean::New(st_.ip_filter_applies));
+    obj->Set(String::NewSymbol("queue_position"), Integer::New(st.queue_position));
+    obj->Set(String::NewSymbol("need_save_resume"), Boolean::New(st.need_save_resume));
+    obj->Set(String::NewSymbol("ip_filter_applies"), Boolean::New(st.ip_filter_applies));
 
-    std::string info_hash = libtorrent::to_hex(st_.info_hash.to_string());
-    st->Set(String::NewSymbol("info_hash"), String::New(info_hash.c_str()));
+    std::string info_hash = libtorrent::to_hex(st.info_hash.to_string());
+    obj->Set(String::NewSymbol("info_hash"), String::New(info_hash.c_str()));
 
-    st->Set(String::NewSymbol("listen_port"), Integer::New(st_.listen_port));
+    obj->Set(String::NewSymbol("listen_port"), Integer::New(st.listen_port));
 
-    return scope.Close(st);
+    return scope.Close(obj);
   };
 
   void bind_torrent_status(Handle<Object> target) {

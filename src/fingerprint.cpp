@@ -47,9 +47,8 @@ namespace nodelt {
       args[4]->Int32Value());
     fp->Wrap(args.This());
 
-    libtorrent::fingerprint* fp_;
-    fp_ = ObjectWrap::Unwrap<FingerprintWrap>(args.This())->GetWrapped();
-    args.This()->Set(String::NewSymbol("name"),             String::New(fp_->name));
+    libtorrent::fingerprint* fp_ = FingerprintWrap::Unwrap(args.This());
+    args.This()->Set(String::NewSymbol("name"),             String::New( fp_->name));
     args.This()->Set(String::NewSymbol("major_version"),    Integer::New(fp_->major_version));
     args.This()->Set(String::NewSymbol("minor_version"),    Integer::New(fp_->minor_version));
     args.This()->Set(String::NewSymbol("revision_version"), Integer::New(fp_->revision_version));
@@ -61,10 +60,9 @@ namespace nodelt {
   Handle<Value> FingerprintWrap::to_string(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::fingerprint* fp_;
-    fp_ = ObjectWrap::Unwrap<FingerprintWrap>(args.This())->GetWrapped();
+    libtorrent::fingerprint* fp = FingerprintWrap::Unwrap(args.This());
 
-    return scope.Close(String::New(fp_->to_string().c_str()));
+    return scope.Close(String::New(fp->to_string().c_str()));
   };
 
 

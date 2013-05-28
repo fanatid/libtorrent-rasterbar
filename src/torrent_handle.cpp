@@ -57,37 +57,34 @@ namespace nodelt {
     return scope.Close(args.This());
   };
 
-  Local<Object> TorrentHandleWrap::New(const libtorrent::torrent_handle& th_) {
+  Local<Object> TorrentHandleWrap::New(const libtorrent::torrent_handle& th) {
     HandleScope scope;
 
-    Local<Object> th = constructor->NewInstance();
-    ObjectWrap::Unwrap<TorrentHandleWrap>(th)->obj_ = new libtorrent::torrent_handle(th_);
+    Local<Object> obj = constructor->NewInstance();
+    ObjectWrap::Unwrap<TorrentHandleWrap>(obj)->obj_ = new libtorrent::torrent_handle(th);
 
-    return scope.Close(th);
+    return scope.Close(obj);
   };
 
   Handle<Value> TorrentHandleWrap::status(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::torrent_handle* th_;
-    libtorrent::torrent_status st_;
+    libtorrent::torrent_handle* th = TorrentHandleWrap::Unwrap(args.This());
+    libtorrent::torrent_status st;
 
-    th_ = ObjectWrap::Unwrap<TorrentHandleWrap>(args.This())->GetWrapped();
-    if (args.Length() == 1) {
-      st_ = th_->status(args[0]->IntegerValue());
-    } else {
-      st_ = th_->status();
-    }
+    if (args.Length() == 1)
+      st = th->status(args[0]->IntegerValue());
+    else
+      st = th->status();
 
-    return scope.Close(torrent_status_to_object(st_));
+    return scope.Close(torrent_status_to_object(st));
   };
 
   Handle<Value> TorrentHandleWrap::set_upload_limit(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::torrent_handle* th_;
-    th_ = ObjectWrap::Unwrap<TorrentHandleWrap>(args.This())->GetWrapped();
-    th_->set_upload_limit(args[0]->Int32Value());
+    libtorrent::torrent_handle* th = TorrentHandleWrap::Unwrap(args.This());
+    th->set_upload_limit(args[0]->Int32Value());
 
     return scope.Close(Undefined());
   };
@@ -95,9 +92,8 @@ namespace nodelt {
   Handle<Value> TorrentHandleWrap::set_download_limit(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::torrent_handle* th_;
-    th_ = ObjectWrap::Unwrap<TorrentHandleWrap>(args.This())->GetWrapped();
-    th_->set_download_limit(args[0]->Int32Value());
+    libtorrent::torrent_handle* th = TorrentHandleWrap::Unwrap(args.This());
+    th->set_download_limit(args[0]->Int32Value());
 
     return scope.Close(Undefined());
   };
@@ -105,19 +101,17 @@ namespace nodelt {
   Handle<Value> TorrentHandleWrap::upload_limit(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::torrent_handle* th_;
-    th_ = ObjectWrap::Unwrap<TorrentHandleWrap>(args.This())->GetWrapped();
+    libtorrent::torrent_handle* th = TorrentHandleWrap::Unwrap(args.This());
 
-    return scope.Close(Int32::New(th_->upload_limit()));
+    return scope.Close(Int32::New(th->upload_limit()));
   };
 
   Handle<Value> TorrentHandleWrap::download_limit(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::torrent_handle* th_;
-    th_ = ObjectWrap::Unwrap<TorrentHandleWrap>(args.This())->GetWrapped();
+    libtorrent::torrent_handle* th = TorrentHandleWrap::Unwrap(args.This());
 
-    return scope.Close(Int32::New(th_->download_limit()));
+    return scope.Close(Int32::New(th->download_limit()));
   };
 
   void bind_torrent_handle(Handle<Object> target) {

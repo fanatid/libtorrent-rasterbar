@@ -11,8 +11,10 @@ namespace nodelt {
   class TorrentHandleWrap: public node::ObjectWrap {
     public:
       static void Initialize(v8::Handle<v8::Object> target);
-      static v8::Local<v8::Object> New(const libtorrent::torrent_handle& th_);
-      libtorrent::torrent_handle* GetWrapped() const { return obj_; };
+      static v8::Local<v8::Object> New(const libtorrent::torrent_handle& th);
+      static libtorrent::torrent_handle* Unwrap(v8::Local<v8::Object> const& obj) {
+        return node::ObjectWrap::Unwrap<TorrentHandleWrap>(obj)->obj_;
+      };
 
     private:
       TorrentHandleWrap();

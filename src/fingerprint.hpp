@@ -11,7 +11,9 @@ namespace nodelt {
   class FingerprintWrap: public node::ObjectWrap {
     public:
       static void Initialize(v8::Handle<v8::Object> target);
-      libtorrent::fingerprint* GetWrapped() const { return obj_; };
+      static libtorrent::fingerprint* Unwrap(v8::Local<v8::Object> const& obj) {
+        return node::ObjectWrap::Unwrap<FingerprintWrap>(obj)->obj_;
+      };
 
     private:
       FingerprintWrap(const char* id_string,

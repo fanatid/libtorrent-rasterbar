@@ -11,7 +11,9 @@ namespace nodelt {
   class CreateTorrentWrap: public node::ObjectWrap {
     public:
       static void Initialize(v8::Handle<v8::Object> target);
-      libtorrent::create_torrent* GetWrapped() const { return obj_; };
+      static libtorrent::create_torrent* Unwrap(v8::Local<v8::Object> const& obj) {
+        return node::ObjectWrap::Unwrap<CreateTorrentWrap>(obj)->obj_;
+      };
 
     private:
       CreateTorrentWrap(libtorrent::file_storage& fs);
