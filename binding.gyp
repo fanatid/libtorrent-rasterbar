@@ -11,6 +11,7 @@
         "src/create_torrent.cpp",
         "src/entry.cpp",
         "src/file_storage.cpp",
+        "src/fingerprint.cpp",
         "src/session.cpp",
         "src/storage.cpp",
         "src/torrent_handle.cpp",

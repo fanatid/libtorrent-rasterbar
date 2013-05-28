@@ -14,7 +14,7 @@ namespace nodelt {
       libtorrent::session* GetWrapped() const { return obj_; };
 
     private:
-      SessionWrap();
+      SessionWrap(v8::Local<v8::Array> args = v8::Array::New());
       ~SessionWrap();
       static v8::Handle<v8::Value> NewInstance(const v8::Arguments& args);
 
