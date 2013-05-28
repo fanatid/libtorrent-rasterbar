@@ -10,7 +10,6 @@ namespace nodelt {
   void bind_add_torrent_params(Handle<Object> target);
   void bind_bencode(Handle<Object> target);
   void bind_create_torrent(Handle<Object> target);
-  void bind_entry(Handle<Object> target);
   void bind_file_storage(Handle<Object> target);
   void bind_fingerprint(Handle<Object> target);
   void bind_session(Handle<Object> target);
@@ -23,7 +22,6 @@ namespace nodelt {
     bind_add_torrent_params(target);
     bind_bencode(target);
     bind_create_torrent(target);
-    bind_entry(target);
     bind_file_storage(target);
     bind_fingerprint(target);
     bind_session(target);

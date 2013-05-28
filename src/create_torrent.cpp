@@ -55,7 +55,7 @@ namespace nodelt {
     CreateTorrentWrap* ct = ObjectWrap::Unwrap<CreateTorrentWrap>(args.This());
     libtorrent::entry entry_ = ct->GetWrapped()->generate();
 
-    return scope.Close(EntryWrap::New(entry_));
+    return scope.Close(entry_to_object(entry_));
   };
 
   Handle<Value> add_files(const Arguments& args) {

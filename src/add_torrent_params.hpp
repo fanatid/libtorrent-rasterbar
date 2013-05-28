@@ -7,7 +7,7 @@
 
 
 namespace nodelt {
-  libtorrent::add_torrent_params object_to_add_torrent_params(v8::Local<v8::Object> obj);
+  libtorrent::add_torrent_params add_torrent_params_from_object(v8::Local<v8::Object> obj);
 };
 
 #endif // NODE_LIBTORRENT_ADD_TORRENT_PARAMS_HPP_INCLUDED

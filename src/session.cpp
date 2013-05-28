@@ -4,11 +4,13 @@
 #include <libtorrent/add_torrent_params.hpp>
 #include <libtorrent/error_code.hpp>
 #include <libtorrent/fingerprint.hpp>
+#include <libtorrent/lazy_entry.hpp>
 #include <libtorrent/session.hpp>
 #include <libtorrent/torrent_handle.hpp>
 #include <libtorrent/torrent_info.hpp>
 
 #include "add_torrent_params.hpp"
+#include "entry.hpp"
 #include "fingerprint.hpp"
 #include "session.hpp"
 #include "torrent_handle.hpp"
@@ -25,14 +27,29 @@ namespace nodelt {
     tpl->SetClassName(String::NewSymbol("session"));
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
     // Prototype
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("save_state"),
+      FunctionTemplate::New(save_state)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("load_state"),
+      FunctionTemplate::New(load_state)->GetFunction());
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("add_torrent"),
+      FunctionTemplate::New(add_torrent)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("async_add_torrent"),
+      FunctionTemplate::New(async_add_torrent)->GetFunction());
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("pause"),
+      FunctionTemplate::New(pause)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("resume"),
+      FunctionTemplate::New(resume)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("is_paused"),
+      FunctionTemplate::New(is_paused)->GetFunction());
+
     tpl->PrototypeTemplate()->Set(String::NewSymbol("is_listening"),
       FunctionTemplate::New(is_listening)->GetFunction());
     tpl->PrototypeTemplate()->Set(String::NewSymbol("listen_port"),
       FunctionTemplate::New(listen_port)->GetFunction());
     tpl->PrototypeTemplate()->Set(String::NewSymbol("listen_on"),
       FunctionTemplate::New(listen_on)->GetFunction());
-    tpl->PrototypeTemplate()->Set(String::NewSymbol("add_torrent"),
-      FunctionTemplate::New(add_torrent)->GetFunction());
 
     target->Set(String::NewSymbol("session"),
       Persistent<Function>::New(tpl->GetFunction()));
@@ -93,6 +110,83 @@ namespace nodelt {
     return scope.Close(args.This());
   };
 
+  Handle<Value> SessionWrap::save_state(const Arguments& args) {
+    HandleScope scope;
+
+    libtorrent::session* s_;
+    s_ = ObjectWrap::Unwrap<SessionWrap>(args.This())->GetWrapped();
+    libtorrent::entry e_;
+    if (args.Length() == 1)
+      s_->save_state(e_, args[0]->IntegerValue());
+    else
+      s_->save_state(e_);
+
+    return scope.Close(entry_to_object(e_));
+  };
+
+  Handle<Value> SessionWrap::load_state(const Arguments& args) {
+    HandleScope scope;
+
+    libtorrent::session* s_;
+    s_ = ObjectWrap::Unwrap<SessionWrap>(args.This())->GetWrapped();
+    libtorrent::entry e_ = entry_from_object(args[0]);
+    // deprecated! need lazy_entry...
+    s_->load_state(e_);
+
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::add_torrent(const Arguments& args) {
+    HandleScope scope;
+
+    libtorrent::session* s_;
+    s_ = ObjectWrap::Unwrap<SessionWrap>(args.This())->GetWrapped();
+    libtorrent::torrent_handle th_;
+    libtorrent::error_code ec_;
+    th_ = s_->add_torrent(add_torrent_params_from_object(args[0]->ToObject()), ec_);
+
+    return scope.Close(TorrentHandleWrap::New(th_));
+  };
+
+  Handle<Value> SessionWrap::async_add_torrent(const Arguments& args) {
+    HandleScope scope;
+
+    libtorrent::session* s_;
+    s_ = ObjectWrap::Unwrap<SessionWrap>(args.This())->GetWrapped();
+    s_->async_add_torrent(add_torrent_params_from_object(args[0]->ToObject()));
+
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::pause(const Arguments& args) {
+    HandleScope scope;
+
+    libtorrent::session* s_;
+    s_ = ObjectWrap::Unwrap<SessionWrap>(args.This())->GetWrapped();
+    s_->pause();
+
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::resume(const Arguments& args) {
+    HandleScope scope;
+
+    libtorrent::session* s_;
+    s_ = ObjectWrap::Unwrap<SessionWrap>(args.This())->GetWrapped();
+    s_->resume();
+    
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::is_paused(const Arguments& args) {
+    HandleScope scope;
+
+    libtorrent::session* s_;
+    s_ = ObjectWrap::Unwrap<SessionWrap>(args.This())->GetWrapped();
+
+    return scope.Close(Boolean::New(s_->is_paused()));
+  };
+
   Handle<Value> SessionWrap::is_listening(const Arguments& args) {
     HandleScope scope;
 
@@ -133,19 +227,6 @@ namespace nodelt {
     }
 
     return scope.Close(Undefined());
-  };
-
-  Handle<Value> SessionWrap::add_torrent(const Arguments& args) {
-    HandleScope scope;
-
-    libtorrent::session* s_;
-    s_ = ObjectWrap::Unwrap<SessionWrap>(args.This())->GetWrapped();
-    libtorrent::torrent_handle th_;
-    libtorrent::error_code ec_;
-
-    th_ = s_->add_torrent(object_to_add_torrent_params(args[0]->ToObject()), ec_);
-
-    return scope.Close(TorrentHandleWrap::New(th_));
   };
 
   void bind_session(Handle<Object> target) {

@@ -12,7 +12,7 @@ using namespace node;
 
 
 namespace nodelt {
-  libtorrent::add_torrent_params object_to_add_torrent_params(Local<Object> obj) {
+  libtorrent::add_torrent_params add_torrent_params_from_object(Local<Object> obj) {
     HandleScope scope;
     libtorrent::add_torrent_params p;
 
