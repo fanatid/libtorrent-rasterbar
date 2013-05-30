@@ -2,17 +2,22 @@
 #include <node.h>
 
 #include <libtorrent/add_torrent_params.hpp>
+#include <libtorrent/disk_io_thread.hpp>
 #include <libtorrent/error_code.hpp>
 #include <libtorrent/fingerprint.hpp>
 #include <libtorrent/lazy_entry.hpp>
 #include <libtorrent/session.hpp>
+#include <libtorrent/session_status.hpp>
 #include <libtorrent/torrent_handle.hpp>
 #include <libtorrent/torrent_info.hpp>
 
 #include "add_torrent_params.hpp"
+#include "disk_io_thread.hpp"
 #include "entry.hpp"
 #include "fingerprint.hpp"
 #include "session.hpp"
+#include "session_settings.hpp"
+#include "session_status.hpp"
 #include "torrent_handle.hpp"
 #include "torrent_info.hpp"
 
@@ -32,6 +37,15 @@ namespace nodelt {
     tpl->PrototypeTemplate()->Set(String::NewSymbol("load_state"),
       FunctionTemplate::New(load_state)->GetFunction());
 
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("post_torrent_updates"),
+      FunctionTemplate::New(post_torrent_updates)->GetFunction());
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("get_torrents"),
+      FunctionTemplate::New(get_torrents)->GetFunction());
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("find_torrent"),
+      FunctionTemplate::New(find_torrent)->GetFunction());
+
     tpl->PrototypeTemplate()->Set(String::NewSymbol("add_torrent"),
       FunctionTemplate::New(add_torrent)->GetFunction());
     tpl->PrototypeTemplate()->Set(String::NewSymbol("async_add_torrent"),
@@ -44,12 +58,64 @@ namespace nodelt {
     tpl->PrototypeTemplate()->Set(String::NewSymbol("is_paused"),
       FunctionTemplate::New(is_paused)->GetFunction());
 
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("status"),
+      FunctionTemplate::New(status)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("get_cache_status"),
+      FunctionTemplate::New(get_cache_status)->GetFunction());
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("get_cache_info"),
+      FunctionTemplate::New(get_cache_info)->GetFunction());
+
+#ifndef TORRENT_DISABLE_DHT
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("start_dht"),
+      FunctionTemplate::New(start_dht)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("stop_dht"),
+      FunctionTemplate::New(stop_dht)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("set_dht_settings"),
+      FunctionTemplate::New(set_dht_settings)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("add_dht_node"),
+      FunctionTemplate::New(add_dht_node)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("add_dht_router"),
+      FunctionTemplate::New(add_dht_router)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("is_dht_running"),
+      FunctionTemplate::New(is_dht_running)->GetFunction());
+#endif
+
+#ifndef TORRENT_DISABLE_DHT
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("load_asnum_db"),
+      FunctionTemplate::New(load_asnum_db)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("load_country_db"),
+      FunctionTemplate::New(load_country_db)->GetFunction());
+#endif
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("set_peer_id"),
+      FunctionTemplate::New(set_peer_id)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("id"),
+      FunctionTemplate::New(id)->GetFunction());
+
     tpl->PrototypeTemplate()->Set(String::NewSymbol("is_listening"),
       FunctionTemplate::New(is_listening)->GetFunction());
     tpl->PrototypeTemplate()->Set(String::NewSymbol("listen_port"),
       FunctionTemplate::New(listen_port)->GetFunction());
     tpl->PrototypeTemplate()->Set(String::NewSymbol("listen_on"),
       FunctionTemplate::New(listen_on)->GetFunction());
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("remove_torrent"),
+      FunctionTemplate::New(remove_torrent)->GetFunction());
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("start_lsd"),
+      FunctionTemplate::New(start_lsd)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("start_natpmp"),
+      FunctionTemplate::New(start_natpmp)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("stop_upnp"),
+      FunctionTemplate::New(stop_upnp)->GetFunction());
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("stop_lsd"),
+      FunctionTemplate::New(stop_lsd)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("stop_natpmp"),
+      FunctionTemplate::New(stop_natpmp)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("stop_upnp"),
+      FunctionTemplate::New(stop_upnp)->GetFunction());
 
     target->Set(String::NewSymbol("session"),
       Persistent<Function>::New(tpl->GetFunction()));
@@ -132,63 +198,231 @@ namespace nodelt {
     return scope.Close(Undefined());
   };
 
+
+  Handle<Value> SessionWrap::post_torrent_updates(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->post_torrent_updates();
+    return scope.Close(Undefined());
+  };
+
+
+  Handle<Value> SessionWrap::get_torrents(const Arguments& args) {
+    HandleScope scope;
+
+    std::vector<libtorrent::torrent_handle> torrents;
+    torrents = SessionWrap::Unwrap(args.This())->get_torrents();
+    Local<Array> ret = Array::New();
+    for (std::vector<libtorrent::torrent_handle>::iterator
+     i(torrents.begin()), e(torrents.end()); i != e; ++i)
+      ret->Set(ret->Length(), TorrentHandleWrap::New(*i));
+
+    return scope.Close(ret);
+  };
+
+
+  Handle<Value> SessionWrap::find_torrent(const Arguments& args) {
+    HandleScope scope;
+
+    libtorrent::sha1_hash info_hash;
+    libtorrent::from_hex(*String::AsciiValue(args[0]), 40, (char*)&info_hash[0]);
+    libtorrent::torrent_handle th = SessionWrap::Unwrap(args.This())->find_torrent(info_hash);
+
+    return scope.Close(TorrentHandleWrap::New(th));
+  };
+
+
   Handle<Value> SessionWrap::add_torrent(const Arguments& args) {
     HandleScope scope;
 
     libtorrent::torrent_handle th;
-    libtorrent::add_torrent_params p = add_torrent_params_from_object(args[0]->ToObject());
     libtorrent::error_code ec;
-    th = SessionWrap::Unwrap(args.This())->add_torrent(p, ec);
+    th = SessionWrap::Unwrap(args.This())->add_torrent(
+      add_torrent_params_from_object(args[0]->ToObject()), ec);
 
     return scope.Close(TorrentHandleWrap::New(th));
   };
 
   Handle<Value> SessionWrap::async_add_torrent(const Arguments& args) {
     HandleScope scope;
-
-    libtorrent::add_torrent_params p = add_torrent_params_from_object(args[0]->ToObject());
-    SessionWrap::Unwrap(args.This())->async_add_torrent(p);
-
+    SessionWrap::Unwrap(args.This())->async_add_torrent(
+      add_torrent_params_from_object(args[0]->ToObject()));
     return scope.Close(Undefined());
   };
 
+
   Handle<Value> SessionWrap::pause(const Arguments& args) {
     HandleScope scope;
-
     SessionWrap::Unwrap(args.This())->pause();
-
     return scope.Close(Undefined());
   };
 
   Handle<Value> SessionWrap::resume(const Arguments& args) {
     HandleScope scope;
-
     SessionWrap::Unwrap(args.This())->resume();
-    
     return scope.Close(Undefined());
   };
 
   Handle<Value> SessionWrap::is_paused(const Arguments& args) {
     HandleScope scope;
-
     libtorrent::session* s = SessionWrap::Unwrap(args.This());
-
     return scope.Close(Boolean::New(s->is_paused()));
   };
 
-  Handle<Value> SessionWrap::is_listening(const Arguments& args) {
+
+  Handle<Value> SessionWrap::status(const Arguments& args) {
+    HandleScope scope;
+    libtorrent::session_status st = SessionWrap::Unwrap(args.This())->status();
+    return scope.Close(session_status_to_object(st));
+  };
+
+  Handle<Value> SessionWrap::get_cache_status(const Arguments& args) {
     HandleScope scope;
 
-    libtorrent::session* s = SessionWrap::Unwrap(args.This());
+    libtorrent::cache_status st = SessionWrap::Unwrap(args.This())->get_cache_status();
+    Local<Object> obj = Object::New();
 
+    obj->Set(String::NewSymbol("blocks_written"), Integer::New(st.blocks_written));
+    obj->Set(String::NewSymbol("writes"), Integer::New(st.writes));
+    obj->Set(String::NewSymbol("blocks_read"), Integer::New(st.blocks_read));
+    obj->Set(String::NewSymbol("blocks_read_hit"), Integer::New(st.blocks_read_hit));
+    obj->Set(String::NewSymbol("reads"), Integer::New(st.reads));
+    obj->Set(String::NewSymbol("queued_bytes"), Integer::New(st.queued_bytes));
+    obj->Set(String::NewSymbol("cache_size"), Integer::New(st.cache_size));
+    obj->Set(String::NewSymbol("read_cache_size"), Integer::New(st.read_cache_size));
+    obj->Set(String::NewSymbol("cache_size"), Integer::New(st.cache_size));
+    obj->Set(String::NewSymbol("total_used_buffers"), Integer::New(st.total_used_buffers));
+
+    obj->Set(String::NewSymbol("average_queue_time"), Integer::New(st.average_queue_time));
+    obj->Set(String::NewSymbol("average_read_time"), Integer::New(st.average_read_time));
+    obj->Set(String::NewSymbol("average_write_time"), Integer::New(st.average_write_time));
+    obj->Set(String::NewSymbol("average_hash_time"), Integer::New(st.average_hash_time));
+    obj->Set(String::NewSymbol("average_job_time"), Integer::New(st.average_job_time));
+    obj->Set(String::NewSymbol("average_sort_time"), Integer::New(st.average_sort_time));
+    obj->Set(String::NewSymbol("job_queue_length"), Integer::New(st.job_queue_length));
+
+    obj->Set(String::NewSymbol("cumulative_job_time"), Integer::New(st.cumulative_job_time));
+    obj->Set(String::NewSymbol("cumulative_read_time"), Integer::New(st.cumulative_read_time));
+    obj->Set(String::NewSymbol("cumulative_write_time"), Integer::New(st.cumulative_write_time));
+    obj->Set(String::NewSymbol("cumulative_hash_time"), Integer::New(st.cumulative_hash_time));
+    obj->Set(String::NewSymbol("cumulative_sort_time"), Integer::New(st.cumulative_sort_time));
+    obj->Set(String::NewSymbol("total_read_back"), Integer::New(st.total_read_back));
+    obj->Set(String::NewSymbol("read_queue_size"), Integer::New(st.cache_size));
+
+    return scope.Close(obj);
+  };
+
+
+  Handle<Value> SessionWrap::get_cache_info(const Arguments& args) {
+    HandleScope scope;
+
+    Local<Array> ret = Array::New();
+    libtorrent::sha1_hash info_hash;
+    libtorrent::from_hex(*String::AsciiValue(args[0]), 40, (char*)&info_hash[0]);
+    std::vector<libtorrent::cached_piece_info> v;
+    SessionWrap::Unwrap(args.This())->get_cache_info(info_hash, v);
+    libtorrent::ptime now = libtorrent::time_now();
+    for (std::vector<libtorrent::cached_piece_info>::iterator i(v.begin()), e(v.end()); i != e; ++i)
+    {
+      Local<Object> obj = Object::New();
+
+      obj->Set(String::NewSymbol("piece"), Integer::New(i->piece));
+      Local<Array> blocks = Array::New();
+      for (std::vector<bool>::const_iterator j(i->blocks.begin()), e(i->blocks.end()); j != e; ++j)
+        blocks->Set(blocks->Length(), Boolean::New(*j));
+      obj->Set(String::NewSymbol("blocks"), blocks);
+      obj->Set(String::NewSymbol("last_use"), Date::New(libtorrent::total_milliseconds(now - i->last_use)));
+      obj->Set(String::NewSymbol("next_to_hash"), Integer::New(i->next_to_hash));
+      obj->Set(String::NewSymbol("kind"), Integer::New(i->kind));
+
+      ret->Set(ret->Length(), obj);
+    }
+
+    return scope.Close(ret);
+  };
+
+#ifndef TORRENT_DISABLE_DHT
+  Handle<Value> SessionWrap::start_dht(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->start_dht();
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::stop_dht(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->stop_dht();
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::set_dht_settings(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->set_dht_settings(
+      dht_settings_from_object(args[0]->ToObject()));
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::add_dht_node(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->add_dht_node(std::make_pair(
+      std::string((*String::AsciiValue(args[0]))), args[0]->IntegerValue()));
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::add_dht_router(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->add_dht_router(std::make_pair(
+      std::string((*String::AsciiValue(args[0]))), args[0]->IntegerValue()));
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::is_dht_running(const Arguments& args) {
+    HandleScope scope;
+    bool ret = SessionWrap::Unwrap(args.This())->is_dht_running();
+    return scope.Close(Boolean::New(ret));
+  };
+#endif
+
+#ifndef TORRENT_DISABLE_DHT
+  Handle<Value> SessionWrap::load_asnum_db(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->load_asnum_db(
+      std::string((*String::Utf8Value(args[0]))).c_str());
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::load_country_db(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->load_country_db(
+      std::string((*String::Utf8Value(args[0]))).c_str());
+    return scope.Close(Undefined());
+  };
+#endif
+
+  Handle<Value> SessionWrap::set_peer_id(const Arguments& args) {
+    HandleScope scope;
+
+    libtorrent::peer_id pid;
+    libtorrent::from_hex(*String::AsciiValue(args[0]->ToString()), 40, (char*)&pid[0]);
+    SessionWrap::Unwrap(args.This())->set_peer_id(pid);
+
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::id(const Arguments& args) {
+    HandleScope scope;
+    std::string ret(SessionWrap::Unwrap(args.This())->id().to_string());
+    return scope.Close(String::New(ret.c_str()));
+  };
+
+
+  Handle<Value> SessionWrap::is_listening(const Arguments& args) {
+    HandleScope scope;
+    libtorrent::session* s = SessionWrap::Unwrap(args.This());
     return scope.Close(Boolean::New(s->is_listening()));
   };
 
   Handle<Value> SessionWrap::listen_port(const Arguments& args) {
     HandleScope scope;
-
     libtorrent::session* s = SessionWrap::Unwrap(args.This());
-
     return scope.Close(Integer::New(s->listen_port()));
   };
 
@@ -214,6 +448,58 @@ namespace nodelt {
 
     return scope.Close(Undefined());
   };
+
+
+  Handle<Value> SessionWrap::remove_torrent(const Arguments& args) {
+    HandleScope scope;
+
+    libtorrent::torrent_handle* th = TorrentHandleWrap::Unwrap(args[0]->ToObject());
+    if (args.Length() == 2)
+      SessionWrap::Unwrap(args.This())->remove_torrent(*th, args[1]->IntegerValue());
+    else
+      SessionWrap::Unwrap(args.This())->remove_torrent(*th);
+
+    return scope.Close(Undefined());
+  };
+
+
+  Handle<Value> SessionWrap::start_lsd(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->start_lsd();
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::start_natpmp(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->start_natpmp();
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::start_upnp(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->start_upnp();
+    return scope.Close(Undefined());
+  };
+
+
+  Handle<Value> SessionWrap::stop_lsd(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->stop_lsd();
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::stop_natpmp(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->stop_natpmp();
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::stop_upnp(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->stop_upnp();
+    return scope.Close(Undefined());
+  };
+
 
   void bind_session(Handle<Object> target) {
     SessionWrap::Initialize(target);
@@ -245,5 +531,21 @@ namespace nodelt {
     save_state_flags_t->Set(String::NewSymbol("save_feeds"),
       Integer::New(libtorrent::session::save_feeds));
     target->Set(String::NewSymbol("save_state_flags_t"), save_state_flags_t);
+
+    // set libtorrent::session::options_t
+    Local<Object> options_t = Object::New();
+    options_t->Set(String::NewSymbol("none"),
+      Integer::New(libtorrent::session::none));
+    options_t->Set(String::NewSymbol("delete_files"),
+      Integer::New(libtorrent::session::delete_files));
+    target->Set(String::NewSymbol("options_t"), options_t);
+
+    // set libtorrent::session::session_flags_t
+    Local<Object> session_flags_t = Object::New();
+    session_flags_t->Set(String::NewSymbol("start_default_features"),
+      Integer::New(libtorrent::session::add_default_plugins));
+    session_flags_t->Set(String::NewSymbol("start_default_features"),
+      Integer::New(libtorrent::session::start_default_features));
+    target->Set(String::NewSymbol("session_flags_t"), session_flags_t);
   };
 }; // namespace nodelt

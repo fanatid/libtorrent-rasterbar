@@ -13,6 +13,8 @@
         "src/file_storage.cpp",
         "src/fingerprint.cpp",
         "src/session.cpp",
+        "src/session_settings.cpp",
+        "src/session_status.cpp",
         "src/storage.cpp",
         "src/torrent_handle.cpp",
         "src/torrent_info.cpp",
