@@ -21,7 +21,7 @@ namespace nodelt {
       Persistent<Function>::New(tpl->GetFunction()));
   };
 
-  TorrentInfoWrap::TorrentInfoWrap(std::string const& filename) {
+  TorrentInfoWrap::TorrentInfoWrap(const std::string& filename) {
     obj_ = new libtorrent::torrent_info(filename);
   };
 

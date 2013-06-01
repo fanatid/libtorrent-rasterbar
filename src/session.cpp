@@ -4,17 +4,29 @@
 #include <libtorrent/add_torrent_params.hpp>
 #include <libtorrent/disk_io_thread.hpp>
 #include <libtorrent/error_code.hpp>
+#include <libtorrent/extensions.hpp>
 #include <libtorrent/fingerprint.hpp>
+#include <libtorrent/ip_filter.hpp>
 #include <libtorrent/lazy_entry.hpp>
+#include <libtorrent/rss.hpp>
 #include <libtorrent/session.hpp>
 #include <libtorrent/session_status.hpp>
 #include <libtorrent/torrent_handle.hpp>
 #include <libtorrent/torrent_info.hpp>
 
+#include <libtorrent/extensions/lt_trackers.hpp>
+#include <libtorrent/extensions/metadata_transfer.hpp>
+#include <libtorrent/extensions/smart_ban.hpp>
+#include <libtorrent/extensions/ut_metadata.hpp>
+#include <libtorrent/extensions/ut_pex.hpp>
+
 #include "add_torrent_params.hpp"
+#include "alert.hpp"
 #include "disk_io_thread.hpp"
 #include "entry.hpp"
 #include "fingerprint.hpp"
+#include "ip_filter.hpp"
+#include "rss.hpp"
 #include "session.hpp"
 #include "session_settings.hpp"
 #include "session_status.hpp"
@@ -66,6 +78,13 @@ namespace nodelt {
     tpl->PrototypeTemplate()->Set(String::NewSymbol("get_cache_info"),
       FunctionTemplate::New(get_cache_info)->GetFunction());
 
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("add_feed"),
+      FunctionTemplate::New(add_feed)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("remove_feed"),
+      FunctionTemplate::New(remove_feed)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("get_feeds"),
+      FunctionTemplate::New(get_feeds)->GetFunction());
+
 #ifndef TORRENT_DISABLE_DHT
     tpl->PrototypeTemplate()->Set(String::NewSymbol("start_dht"),
       FunctionTemplate::New(start_dht)->GetFunction());
@@ -81,12 +100,22 @@ namespace nodelt {
       FunctionTemplate::New(is_dht_running)->GetFunction());
 #endif
 
+#ifndef TORRENT_DISABLE_EXTENSIONS
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("add_extension"),
+      FunctionTemplate::New(add_extension)->GetFunction());
+#endif
+
 #ifndef TORRENT_DISABLE_DHT
     tpl->PrototypeTemplate()->Set(String::NewSymbol("load_asnum_db"),
       FunctionTemplate::New(load_asnum_db)->GetFunction());
     tpl->PrototypeTemplate()->Set(String::NewSymbol("load_country_db"),
       FunctionTemplate::New(load_country_db)->GetFunction());
 #endif
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("set_ip_filter"),
+      FunctionTemplate::New(set_ip_filter)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("get_ip_filter"),
+      FunctionTemplate::New(get_ip_filter)->GetFunction());
 
     tpl->PrototypeTemplate()->Set(String::NewSymbol("set_peer_id"),
       FunctionTemplate::New(set_peer_id)->GetFunction());
@@ -102,6 +131,32 @@ namespace nodelt {
 
     tpl->PrototypeTemplate()->Set(String::NewSymbol("remove_torrent"),
       FunctionTemplate::New(remove_torrent)->GetFunction());
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("set_settings"),
+      FunctionTemplate::New(set_settings)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("settings"),
+      FunctionTemplate::New(settings)->GetFunction());
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("set_proxy"),
+      FunctionTemplate::New(set_proxy)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("proxy"),
+      FunctionTemplate::New(proxy)->GetFunction());
+
+#if TORRENT_USE_I2P
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("set_i2p_proxy"),
+      FunctionTemplate::New(set_i2p_proxy)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("i2p_proxy"),
+      FunctionTemplate::New(i2p_proxy)->GetFunction());
+#endif
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("pop_alert"),
+      FunctionTemplate::New(pop_alert)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("pop_alerts"),
+      FunctionTemplate::New(pop_alerts)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("set_alert_mask"),
+      FunctionTemplate::New(set_alert_mask)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("wait_for_alert"),
+      FunctionTemplate::New(wait_for_alert)->GetFunction());
 
     tpl->PrototypeTemplate()->Set(String::NewSymbol("start_lsd"),
       FunctionTemplate::New(start_lsd)->GetFunction());
@@ -213,7 +268,7 @@ namespace nodelt {
     torrents = SessionWrap::Unwrap(args.This())->get_torrents();
     Local<Array> ret = Array::New();
     for (std::vector<libtorrent::torrent_handle>::iterator
-     i(torrents.begin()), e(torrents.end()); i != e; ++i)
+         i(torrents.begin()), e(torrents.end()); i != e; ++i)
       ret->Set(ret->Length(), TorrentHandleWrap::New(*i));
 
     return scope.Close(ret);
@@ -340,6 +395,34 @@ namespace nodelt {
     return scope.Close(ret);
   };
 
+
+  Handle<Value> SessionWrap::add_feed(const Arguments& args) {
+    HandleScope scope;
+
+    libtorrent::feed_settings fs = feed_settings_from_object(args[0]->ToObject());
+    libtorrent::feed_handle fh = SessionWrap::Unwrap(args.This())->add_feed(fs);
+    return scope.Close(FeedHandleWrap::New(fh));
+  };
+
+  Handle<Value> SessionWrap::remove_feed(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->remove_feed(
+      *FeedHandleWrap::Unwrap(args[0]->ToObject()));
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::get_feeds(const Arguments& args) {
+    HandleScope scope;
+    
+    std::vector<libtorrent::feed_handle> feeds;
+    SessionWrap::Unwrap(args.This())->get_feeds(feeds);
+    Local<Array> ret = Array::New();
+    for (std::vector<libtorrent::feed_handle>::iterator
+         i(feeds.begin()), e(feeds.end()); i != e; ++i)
+      ret->Set(ret->Length(), FeedHandleWrap::New(*i));
+    return scope.Close(ret);
+  };
+
 #ifndef TORRENT_DISABLE_DHT
   Handle<Value> SessionWrap::start_dht(const Arguments& args) {
     HandleScope scope;
@@ -381,7 +464,28 @@ namespace nodelt {
   };
 #endif
 
-#ifndef TORRENT_DISABLE_DHT
+#ifndef TORRENT_DISABLE_EXTENSIONS
+  Handle<Value> SessionWrap::add_extension(const Arguments& args) {
+    HandleScope scope;
+
+    libtorrent::session* s = SessionWrap::Unwrap(args.This());
+    std::string name(*String::Utf8Value(args[0]));
+    if (name == "ut_metadata")
+      s->add_extension(libtorrent::create_ut_metadata_plugin);
+    else if (name == "ut_pex")
+      s->add_extension(libtorrent::create_ut_pex_plugin);
+    else if (name == "smart_ban")
+      s->add_extension(libtorrent::create_smart_ban_plugin);
+    else if (name == "lt_trackers")
+      s->add_extension(libtorrent::create_lt_trackers_plugin);
+    else if (name == "metadata_transfer")
+      s->add_extension(libtorrent::create_metadata_plugin);
+
+    return scope.Close(Undefined());
+  };
+#endif
+
+#ifndef TORRENT_DISABLE_GEO_IP
   Handle<Value> SessionWrap::load_asnum_db(const Arguments& args) {
     HandleScope scope;
     SessionWrap::Unwrap(args.This())->load_asnum_db(
@@ -396,6 +500,20 @@ namespace nodelt {
     return scope.Close(Undefined());
   };
 #endif
+
+  Handle<Value> SessionWrap::set_ip_filter(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->set_ip_filter(
+      *IpFilterWrap::Unwrap(args[0]->ToObject()));
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::get_ip_filter(const Arguments& args) {
+    HandleScope scope;
+    libtorrent::ip_filter f = SessionWrap::Unwrap(args.This())->get_ip_filter();
+    return scope.Close(IpFilterWrap::New(f));
+  };
+
 
   Handle<Value> SessionWrap::set_peer_id(const Arguments& args) {
     HandleScope scope;
@@ -460,6 +578,82 @@ namespace nodelt {
       SessionWrap::Unwrap(args.This())->remove_torrent(*th);
 
     return scope.Close(Undefined());
+  };
+
+
+  Handle<Value> SessionWrap::set_settings(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->set_settings(
+      session_settings_from_object(args[0]->ToObject()));
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::settings(const Arguments& args) {
+    HandleScope scope;
+    libtorrent::session_settings s = SessionWrap::Unwrap(args.This())->settings();
+    return scope.Close(session_settings_to_object(s));
+  };
+
+
+  Handle<Value> SessionWrap::set_proxy(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->set_proxy(
+      proxy_settings_from_object(args[0]->ToObject()));
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::proxy(const Arguments& args) {
+    HandleScope scope;
+    libtorrent::proxy_settings s = SessionWrap::Unwrap(args.This())->proxy();
+    return scope.Close(proxy_settings_to_object(s));
+  };
+
+#if TORRENT_USE_I2P
+  Handle<Value> SessionWrap::set_i2p_proxy(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->set_i2p_proxy(
+      proxy_settings_from_object(args[0]->ToObject()));
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::i2p_proxy(const Arguments& args) {
+    HandleScope scope;
+    libtorrent::proxy_settings s = SessionWrap::Unwrap(args.This())->i2p_proxy();
+    return scope.Close(proxy_settings_to_object(s));
+  };
+#endif
+
+  Handle<Value> SessionWrap::pop_alert(const Arguments& args) {
+    HandleScope scope;
+    return scope.Close(
+      alert_to_object(*SessionWrap::Unwrap(args.This())->pop_alert()));
+  };
+
+  Handle<Value> SessionWrap::pop_alerts(const Arguments& args) {
+    HandleScope scope;
+
+    Local<Array> ret = Array::New();
+    std::deque<libtorrent::alert*> alerts;
+    SessionWrap::Unwrap(args.This())->pop_alerts(&alerts);
+    for (std::deque<libtorrent::alert*>::iterator
+         i(alerts.begin()), e(alerts.end()); i != e; ++i)
+      ret->Set(ret->Length(), alert_to_object(**i));
+    return scope.Close(ret);
+  };
+
+  Handle<Value> SessionWrap::set_alert_mask(const Arguments& args) {
+    HandleScope scope;
+    SessionWrap::Unwrap(args.This())->set_alert_mask(args[0]->Uint32Value());
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> SessionWrap::wait_for_alert(const Arguments& args) {
+    HandleScope scope;
+    
+    const libtorrent::alert* alert;
+    alert = SessionWrap::Unwrap(args.This())->wait_for_alert(
+      libtorrent::milliseconds(args[0]->IntegerValue()));
+    return scope.Close(alert_to_object(*alert));
   };
 
 

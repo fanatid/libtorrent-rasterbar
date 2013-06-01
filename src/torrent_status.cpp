@@ -13,7 +13,7 @@ using namespace node;
 
 
 namespace nodelt {
-  Local<Array> bitfield_to_array(libtorrent::bitfield& bf) {
+  Local<Array> bitfield_to_array(const libtorrent::bitfield& bf) {
     HandleScope scope;
 
     Local<Array> obj = Array::New();
@@ -23,7 +23,7 @@ namespace nodelt {
     return scope.Close(obj);
   };
 
-  Local<Object> time_duration_to_object(boost::posix_time::time_duration& td) {
+  Local<Object> time_duration_to_object(const boost::posix_time::time_duration& td) {
     HandleScope scope;
 
     Local<Object> obj = Object::New();
@@ -34,7 +34,7 @@ namespace nodelt {
     return scope.Close(obj);
   };
 
-  Handle<Value> torrent_status_to_object(libtorrent::torrent_status& st) {
+  Handle<Value> torrent_status_to_object(const libtorrent::torrent_status& st) {
     HandleScope scope;
     Local<Object> obj = Object::New();
 

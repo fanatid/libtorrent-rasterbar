@@ -9,7 +9,7 @@ using namespace v8;
 
 namespace nodelt {
 #ifndef TORRENT_DISABLE_DHT
-  Local<Object> dht_lookup_to_object(libtorrent::dht_lookup const& dht) {
+  Local<Object> dht_lookup_to_object(const libtorrent::dht_lookup& dht) {
     HandleScope scope;
     Local<Object> obj = Object::New();
 
@@ -25,7 +25,7 @@ namespace nodelt {
     return scope.Close(obj);
   };
 
-  Local<Object> dht_routing_bucket_to_object(libtorrent::dht_routing_bucket const& dht) {
+  Local<Object> dht_routing_bucket_to_object(const libtorrent::dht_routing_bucket& dht) {
     HandleScope scope;
     Local<Object> obj = Object::New();
 
@@ -37,7 +37,7 @@ namespace nodelt {
   };
 #endif
 
-  Local<Object> utp_status_to_object(libtorrent::utp_status const& st) {
+  Local<Object> utp_status_to_object(const libtorrent::utp_status& st) {
     HandleScope scope;
     Local<Object> obj = Object::New();
 
@@ -50,7 +50,7 @@ namespace nodelt {
     return scope.Close(obj);
   };
 
-  Local<Object> session_status_to_object(libtorrent::session_status const& st) {
+  Local<Object> session_status_to_object(const libtorrent::session_status& st) {
     HandleScope scope;
     Local<Object> obj = Object::New();
 

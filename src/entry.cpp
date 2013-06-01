@@ -8,7 +8,7 @@ using namespace v8;
 
 
 namespace nodelt {
-  Local<Value> entry_to_object(libtorrent::entry const& e_) {
+  Local<Value> entry_to_object(const libtorrent::entry& e_) {
     HandleScope scope;
 
     if (e_.type() == libtorrent::entry::int_t) {
@@ -30,7 +30,7 @@ namespace nodelt {
     return scope.Close(Object::New());
   };
 
-  libtorrent::entry entry_from_object(Local<Value> const& obj) {
+  libtorrent::entry entry_from_object(Local<Value> obj) {
     libtorrent::entry e_;
 
     if (obj->IsNumber()) {
