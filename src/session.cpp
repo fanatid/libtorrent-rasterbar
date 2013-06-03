@@ -39,11 +39,10 @@ using namespace node;
 
 namespace nodelt {
   void SessionWrap::Initialize(Handle<Object> target) {
-    // Prepare constructor template
     Local<FunctionTemplate> tpl = FunctionTemplate::New(NewInstance);
     tpl->SetClassName(String::NewSymbol("session"));
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
-    // Prototype
+
     tpl->PrototypeTemplate()->Set(String::NewSymbol("save_state"),
       FunctionTemplate::New(save_state)->GetFunction());
     tpl->PrototypeTemplate()->Set(String::NewSymbol("load_state"),

@@ -13,11 +13,10 @@ namespace nodelt {
   Persistent<Function> IpFilterWrap::constructor;
 
   void IpFilterWrap::Initialize(Handle<Object> target) {
-    // Prepare constructor template
     Local<FunctionTemplate> tpl = FunctionTemplate::New(NewInstance);
     tpl->SetClassName(String::NewSymbol("ip_filter"));
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
-    // Prototype
+
     tpl->PrototypeTemplate()->Set(String::NewSymbol("add_rule"),
       FunctionTemplate::New(add_rule)->GetFunction());
     tpl->PrototypeTemplate()->Set(String::NewSymbol("access"),

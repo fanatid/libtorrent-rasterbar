@@ -15,11 +15,10 @@ using namespace node;
 
 namespace nodelt {
   void CreateTorrentWrap::Initialize(Handle<Object> target) {
-    // Prepare constructor template
     Local<FunctionTemplate> tpl = FunctionTemplate::New(NewInstance);
     tpl->SetClassName(String::NewSymbol("create_torrent"));
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
-    // Prototype
+
     tpl->PrototypeTemplate()->Set(String::NewSymbol("generate"),
       FunctionTemplate::New(generate)->GetFunction());
 

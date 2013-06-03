@@ -17,18 +17,15 @@ namespace nodelt {
       };
 
     private:
+      libtorrent::ip_filter* obj_;
       IpFilterWrap();
       ~IpFilterWrap();
       static v8::Persistent<v8::Function> constructor;
       static v8::Handle<v8::Value> NewInstance(const v8::Arguments& args);
 
-      // Wrapped methods
       static v8::Handle<v8::Value> add_rule(const v8::Arguments& args);
       static v8::Handle<v8::Value> access(const v8::Arguments& args);
       static v8::Handle<v8::Value> export_filter(const v8::Arguments& args);
-
-      // Wrapped object
-      libtorrent::ip_filter* obj_;
   };
 };
 

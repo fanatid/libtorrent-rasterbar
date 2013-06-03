@@ -14,6 +14,7 @@ namespace nodelt {
   void bind_file_storage(Handle<Object> target);
   void bind_fingerprint(Handle<Object> target);
   void bind_ip_filter(Handle<Object> target);
+  void bind_peer_info(Handle<Object> target);
   void bind_session(Handle<Object> target);
   void bind_session_settings(Handle<Object> target);
   void bind_storage(Handle<Object> target);
@@ -29,6 +30,7 @@ namespace nodelt {
     bind_file_storage(target);
     bind_fingerprint(target);
     bind_ip_filter(target);
+    bind_peer_info(target);
     bind_session(target);
     bind_session_settings(target);
     bind_storage(target);
@@ -43,3 +45,4 @@ namespace nodelt {
 }; // namespace nodelt
 
 NODE_MODULE(libtorrent, nodelt::Initialize);
+

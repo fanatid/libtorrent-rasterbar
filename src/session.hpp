@@ -16,11 +16,11 @@ namespace nodelt {
       };
 
     private:
+      libtorrent::session* obj_;
       SessionWrap(v8::Local<v8::Array> args = v8::Array::New());
       ~SessionWrap();
       static v8::Handle<v8::Value> NewInstance(const v8::Arguments& args);
 
-      // Wrapped methods
       static v8::Handle<v8::Value> save_state(const v8::Arguments& args);
       static v8::Handle<v8::Value> load_state(const v8::Arguments& args);
 
@@ -99,9 +99,6 @@ namespace nodelt {
       static v8::Handle<v8::Value> stop_lsd(const v8::Arguments& args);
       static v8::Handle<v8::Value> stop_natpmp(const v8::Arguments& args);
       static v8::Handle<v8::Value> stop_upnp(const v8::Arguments& args);
-
-      // Wrapped object
-      libtorrent::session* obj_;
   };
 };
 

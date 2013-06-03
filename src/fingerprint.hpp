@@ -16,16 +16,13 @@ namespace nodelt {
       };
 
     private:
+      libtorrent::fingerprint* obj_;
       FingerprintWrap(const char* id_string,
         int major, int minor, int revision, int tag);
       ~FingerprintWrap();
       static v8::Handle<v8::Value> NewInstance(const v8::Arguments& args);
 
-      // Wrapped methods
       static v8::Handle<v8::Value> to_string(const v8::Arguments& args);
-
-      // Wrapped object
-      libtorrent::fingerprint* obj_;
   };
 };
 

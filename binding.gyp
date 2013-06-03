@@ -14,6 +14,7 @@
         "src/file_storage.cpp",
         "src/fingerprint.cpp",
         "src/ip_filter.cpp",
+        "src/peer_info.cpp",
         "src/rss.cpp",
         "src/session.cpp",
         "src/session_settings.cpp",

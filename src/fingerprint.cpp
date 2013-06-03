@@ -11,11 +11,10 @@ using namespace node;
 
 namespace nodelt {
   void FingerprintWrap::Initialize(Handle<Object> target) {
-    // Prepare constructor template
     Local<FunctionTemplate> tpl = FunctionTemplate::New(NewInstance);
     tpl->SetClassName(String::NewSymbol("fingerprint"));
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
-    // Prototype
+
     tpl->PrototypeTemplate()->Set(String::NewSymbol("to_string"),
       FunctionTemplate::New(to_string)->GetFunction());
 

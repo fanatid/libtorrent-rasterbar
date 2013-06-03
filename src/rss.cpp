@@ -44,11 +44,10 @@ namespace nodelt {
   Persistent<Function> FeedHandleWrap::constructor;
 
   void FeedHandleWrap::Initialize(Handle<Object> target) {
-    // Prepare constructor template
     Local<FunctionTemplate> tpl = FunctionTemplate::New(NewInstance);
     tpl->SetClassName(String::NewSymbol("FeedHandle"));
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
-    // Prototype
+
     tpl->PrototypeTemplate()->Set(String::NewSymbol("update_feed"),
       FunctionTemplate::New(update_feed)->GetFunction());
     tpl->PrototypeTemplate()->Set(String::NewSymbol("get_feed_status"),
@@ -92,13 +91,13 @@ namespace nodelt {
     return scope.Close(obj);
   };
 
-  Handle<Value> update_feed(const Arguments& args) {
+  Handle<Value> FeedHandleWrap::update_feed(const Arguments& args) {
     HandleScope scope;
     FeedHandleWrap::Unwrap(args.This())->update_feed();
     return scope.Close(Undefined());
   };
 
-  Handle<Value> get_feed_status(const Arguments& args) {
+  Handle<Value> FeedHandleWrap::get_feed_status(const Arguments& args) {
     HandleScope scope;
 
     libtorrent::feed_status s = FeedHandleWrap::Unwrap(args.This())->get_feed_status();
@@ -130,14 +129,14 @@ namespace nodelt {
     return scope.Close(Undefined());
   };
 
-  Handle<Value> set_settings(const Arguments& args) {
+  Handle<Value> FeedHandleWrap::set_settings(const Arguments& args) {
     HandleScope scope;
     FeedHandleWrap::Unwrap(args.This())->set_settings(
       feed_settings_from_object(args[0]->ToObject()));
     return scope.Close(Undefined());
   };
 
-  Handle<Value> settings(const Arguments& args) {
+  Handle<Value> FeedHandleWrap::settings(const Arguments& args) {
     HandleScope scope;
     libtorrent::feed_settings fs = FeedHandleWrap::Unwrap(args.This())->settings();
     return scope.Close(feed_settings_to_object(fs));

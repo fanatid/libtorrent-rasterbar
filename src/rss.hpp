@@ -20,19 +20,16 @@ namespace nodelt {
       };
 
     private:
+      libtorrent::feed_handle* obj_;
       FeedHandleWrap();
       ~FeedHandleWrap();
       static v8::Persistent<v8::Function> constructor;
       static v8::Handle<v8::Value> NewInstance(const v8::Arguments& args);
 
-      // Wrapped methods
       static v8::Handle<v8::Value> update_feed(const v8::Arguments& args);
       static v8::Handle<v8::Value> get_feed_status(const v8::Arguments& args);
       static v8::Handle<v8::Value> set_settings(const v8::Arguments& args);
       static v8::Handle<v8::Value> settings(const v8::Arguments& args);
-
-      // Wrapped object
-      libtorrent::feed_handle* obj_;
   };
 };
 

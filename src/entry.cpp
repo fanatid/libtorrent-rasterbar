@@ -36,7 +36,6 @@ namespace nodelt {
     if (obj->IsNumber()) {
       e_ = (libtorrent::entry::integer_type) obj->IntegerValue();
     } else if (obj->IsString()) {
-      // ascii ?
       e_ = std::string(*String::AsciiValue(obj));
     } else if (obj->IsArray()) {
       libtorrent::entry::list_type res;
