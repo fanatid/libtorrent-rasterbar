@@ -23,5 +23,11 @@
   "keywords": [
     "libtorrent",
     "torrents"
-  ]
+  ],
+  "readmeFilename": "README.md",
+  "gypfile": true,
+  "directories": {
+    "example": "examples"
+  },
+  "license": "BSD"
 }

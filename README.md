@@ -3,7 +3,11 @@
 node-libtorrent provides native bindings to [libtorrent rastebar](http://www.rasterbar.com/products/libtorrent/) as a [Node.js addon](http://nodejs.org/docs/latest/api/addons.html).
 
 # Getting started
-From your project diretctory, run:
+Execute in command line:
+```
+$ npm install node-libtorrent
+```
+or copy repository and build bindings manually
 ```
 $ git clone git://github.com/fanatid/node-libtorrent.git
 $ cd node-libtorrent
