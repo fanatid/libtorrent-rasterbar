@@ -8,6 +8,11 @@
 
 
 namespace nodelt {
+  v8::Local<v8::Object> file_entry_to_object(const libtorrent::file_entry& e);
+  libtorrent::file_entry file_entry_from_object(v8::Local<v8::Object> obj);
+
+  v8::Local<v8::Object> file_slice_to_object(const libtorrent::file_slice& fs);
+
   class FileStorageWrap: public node::ObjectWrap {
     public:
       static void Initialize(v8::Handle<v8::Object> target);

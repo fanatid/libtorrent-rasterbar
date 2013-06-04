@@ -49,6 +49,38 @@ namespace nodelt {
       FunctionTemplate::New(http_seeds)->GetFunction());
     tpl->PrototypeTemplate()->Set(String::NewSymbol("get_torrent_info"),
       FunctionTemplate::New(get_torrent_info)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("set_metadata"),
+      FunctionTemplate::New(set_metadata)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("is_valid"),
+      FunctionTemplate::New(is_valid)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("pause"),
+      FunctionTemplate::New(pause)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("resume"),
+      FunctionTemplate::New(resume)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("clear_error"),
+      FunctionTemplate::New(clear_error)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("set_priority"),
+      FunctionTemplate::New(set_priority)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("super_seeding"),
+      FunctionTemplate::New(super_seeding)->GetFunction());
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("auto_managed"),
+      FunctionTemplate::New(auto_managed)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("queue_position"),
+      FunctionTemplate::New(queue_position)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("queue_position_up"),
+      FunctionTemplate::New(queue_position_up)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("queue_position_down"),
+      FunctionTemplate::New(queue_position_down)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("queue_position_top"),
+      FunctionTemplate::New(queue_position_top)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("queue_position_bottom"),
+      FunctionTemplate::New(queue_position_bottom)->GetFunction());
+
+#ifndef TORRENT_DISABLE_RESOLVE_COUNTRIES
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("resolve_countries"),
+      FunctionTemplate::New(resolve_countries)->GetFunction());
+#endif
 
     tpl->PrototypeTemplate()->Set(String::NewSymbol("add_piece"),
       FunctionTemplate::New(add_piece)->GetFunction());
@@ -56,7 +88,50 @@ namespace nodelt {
       FunctionTemplate::New(read_piece)->GetFunction());
     tpl->PrototypeTemplate()->Set(String::NewSymbol("have_piece"),
       FunctionTemplate::New(have_piece)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("set_piece_deadline"),
+      FunctionTemplate::New(set_piece_deadline)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("reset_piece_deadline"),
+      FunctionTemplate::New(reset_piece_deadline)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("piece_availability"),
+      FunctionTemplate::New(piece_availability)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("piece_priority"),
+      FunctionTemplate::New(piece_priority)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("prioritize_pieces"),
+      FunctionTemplate::New(prioritize_pieces)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("piece_priorities"),
+      FunctionTemplate::New(piece_priorities)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("prioritize_files"),
+      FunctionTemplate::New(prioritize_files)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("file_priorities"),
+      FunctionTemplate::New(file_priorities)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("file_priority"),
+      FunctionTemplate::New(file_priority)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("use_interface"),
+      FunctionTemplate::New(use_interface)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("save_resume_data"),
+      FunctionTemplate::New(save_resume_data)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("need_save_resume_data"),
+      FunctionTemplate::New(need_save_resume_data)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("force_reannounce"),
+      FunctionTemplate::New(force_reannounce)->GetFunction());
 
+#ifndef TORRENT_DISABLE_DHT
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("force_dht_announce"),
+      FunctionTemplate::New(force_dht_announce)->GetFunction());
+#endif
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("scrape_tracker"),
+      FunctionTemplate::New(scrape_tracker)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("name"),
+      FunctionTemplate::New(name)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("set_upload_mode"),
+      FunctionTemplate::New(set_upload_mode)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("set_share_mode"),
+      FunctionTemplate::New(set_share_mode)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("flush_cache"),
+      FunctionTemplate::New(flush_cache)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("apply_ip_filter"),
+      FunctionTemplate::New(apply_ip_filter)->GetFunction());
     tpl->PrototypeTemplate()->Set(String::NewSymbol("set_upload_limit"),
       FunctionTemplate::New(set_upload_limit)->GetFunction());
     tpl->PrototypeTemplate()->Set(String::NewSymbol("set_download_limit"),
@@ -65,6 +140,32 @@ namespace nodelt {
       FunctionTemplate::New(upload_limit)->GetFunction());
     tpl->PrototypeTemplate()->Set(String::NewSymbol("download_limit"),
       FunctionTemplate::New(download_limit)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("set_sequential_download"),
+      FunctionTemplate::New(set_sequential_download)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("connect_peer"),
+      FunctionTemplate::New(connect_peer)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("save_path"),
+      FunctionTemplate::New(save_path)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("set_max_uploads"),
+      FunctionTemplate::New(set_max_uploads)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("max_uploads"),
+      FunctionTemplate::New(max_uploads)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("set_max_connections"),
+      FunctionTemplate::New(set_max_connections)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("max_connections"),
+      FunctionTemplate::New(max_connections)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("set_tracker_login"),
+      FunctionTemplate::New(set_tracker_login)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("move_storage"),
+      FunctionTemplate::New(move_storage)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("info_hash"),
+      FunctionTemplate::New(info_hash)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("force_recheck"),
+      FunctionTemplate::New(force_recheck)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("rename_file"),
+      FunctionTemplate::New(rename_file)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("set_ssl_certificate"),
+      FunctionTemplate::New(set_ssl_certificate)->GetFunction());
 
     constructor = Persistent<Function>::New(tpl->GetFunction());
   };
@@ -261,8 +362,92 @@ namespace nodelt {
     return scope.Close(TorrentInfoWrap::New(ti));
   };
 
+  Handle<Value> TorrentHandleWrap::set_metadata(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::is_valid(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::pause(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::resume(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::clear_error(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::set_priority(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::super_seeding(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
 
 
+  Handle<Value> TorrentHandleWrap::auto_managed(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::queue_position(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::queue_position_up(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::queue_position_down(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::queue_position_top(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::queue_position_bottom(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+#ifndef TORRENT_DISABLE_RESOLVE_COUNTRIES
+  Handle<Value> TorrentHandleWrap::resolve_countries(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+#endif
 
   Handle<Value> TorrentHandleWrap::add_piece(const Arguments& args) {
     HandleScope scope;
@@ -286,6 +471,128 @@ namespace nodelt {
     HandleScope scope;
     bool ret = TorrentHandleWrap::Unwrap(args.This())->have_piece(args[0]->IntegerValue());
     return scope.Close(Boolean::New(ret));
+  };
+
+  Handle<Value> TorrentHandleWrap::set_piece_deadline(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::reset_piece_deadline(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::piece_availability(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::piece_priority(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::prioritize_pieces(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::piece_priorities(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::prioritize_files(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::file_priorities(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::file_priority(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::use_interface(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::save_resume_data(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::need_save_resume_data(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::force_reannounce(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+#ifndef TORRENT_DISABLE_DHT
+  Handle<Value> TorrentHandleWrap::force_dht_announce(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+#endif
+
+  Handle<Value> TorrentHandleWrap::scrape_tracker(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::name(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::set_upload_mode(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::set_share_mode(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::flush_cache(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::apply_ip_filter(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::set_upload_limit(const Arguments& args) {
@@ -321,6 +628,85 @@ namespace nodelt {
 
     return scope.Close(Int32::New(th->download_limit()));
   };
+
+  Handle<Value> TorrentHandleWrap::set_sequential_download(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::connect_peer(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::save_path(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::set_max_uploads(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::max_uploads(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::set_max_connections(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::max_connections(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::set_tracker_login(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::move_storage(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::info_hash(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::force_recheck(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::rename_file(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentHandleWrap::set_ssl_certificate(const Arguments& args) {
+    HandleScope scope;
+    // TODO
+    return scope.Close(Undefined());
+  };
+
 
   void bind_torrent_handle(Handle<Object> target) {
     TorrentHandleWrap::Initialize(target);

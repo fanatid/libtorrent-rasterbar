@@ -60,6 +60,16 @@ namespace nodelt {
     return e;
   };
 
+  Local<Object> file_slice_to_object(const libtorrent::file_slice& fs) {
+    HandleScope scope;
+
+    Local<Object> ret = Object::New();
+    ret->Set(String::NewSymbol("file_index"), Integer::New(fs.file_index));
+    ret->Set(String::NewSymbol("offset"), Integer::New(fs.offset));
+    ret->Set(String::NewSymbol("size"), Integer::New(fs.size));
+    return scope.Close(ret);
+  };
+
   Persistent<Function> FileStorageWrap::constructor;
 
   void FileStorageWrap::Initialize(Handle<Object> target) {

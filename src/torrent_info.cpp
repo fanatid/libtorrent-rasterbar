@@ -29,6 +29,60 @@ namespace nodelt {
     tpl->PrototypeTemplate()->Set(String::NewSymbol("web_seeds"),
       FunctionTemplate::New(web_seeds)->GetFunction());
 
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("name"),
+      FunctionTemplate::New(name)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("comment"),
+      FunctionTemplate::New(comment)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("creator"),
+      FunctionTemplate::New(creator)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("total_size"),
+      FunctionTemplate::New(total_size)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("piece_length"),
+      FunctionTemplate::New(piece_length)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("num_pieces"),
+      FunctionTemplate::New(num_pieces)->GetFunction());
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("hash_for_piece"),
+      FunctionTemplate::New(hash_for_piece)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("merkle_tree"),
+      FunctionTemplate::New(merkle_tree)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("set_merkle_tree"),
+      FunctionTemplate::New(set_merkle_tree)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("piece_size"),
+      FunctionTemplate::New(piece_size)->GetFunction());
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("num_files"),
+      FunctionTemplate::New(num_files)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("file_at"),
+      FunctionTemplate::New(file_at)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("files"),
+      FunctionTemplate::New(files)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("orig_files"),
+      FunctionTemplate::New(orig_files)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("rename_file"),
+      FunctionTemplate::New(rename_file)->GetFunction());
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("priv"),
+      FunctionTemplate::New(priv)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("trackers"),
+      FunctionTemplate::New(trackers)->GetFunction());
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("creation_date"),
+      FunctionTemplate::New(creation_date)->GetFunction());
+
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("add_node"),
+      FunctionTemplate::New(add_node)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("nodes"),
+      FunctionTemplate::New(nodes)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("metadata"),
+      FunctionTemplate::New(metadata)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("metadata_size"),
+      FunctionTemplate::New(metadata_size)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("map_block"),
+      FunctionTemplate::New(map_block)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("map_file"),
+      FunctionTemplate::New(map_file)->GetFunction());
+
     target->Set(String::NewSymbol("torrent_info"),
       Persistent<Function>::New(tpl->GetFunction()));
 
@@ -179,7 +233,203 @@ namespace nodelt {
     return scope.Close(ret);
   };
 
+  Handle<Value> TorrentInfoWrap::name(const Arguments& args) {
+    HandleScope scope;
+    return scope.Close(String::New(
+      TorrentInfoWrap::Unwrap(args.This())->name().c_str()));
+  };
 
+  Handle<Value> TorrentInfoWrap::comment(const Arguments& args) {
+    HandleScope scope;
+    return scope.Close(String::New(
+      TorrentInfoWrap::Unwrap(args.This())->comment().c_str()));
+  };
+
+  Handle<Value> TorrentInfoWrap::creator(const Arguments& args) {
+    HandleScope scope;
+    return scope.Close(String::New(
+      TorrentInfoWrap::Unwrap(args.This())->creator().c_str()));
+  };
+
+  Handle<Value> TorrentInfoWrap::total_size(const Arguments& args) {
+    HandleScope scope;
+    return scope.Close(Integer::New(
+      TorrentInfoWrap::Unwrap(args.This())->total_size()));
+  };
+
+  Handle<Value> TorrentInfoWrap::piece_length(const Arguments& args) {
+    HandleScope scope;
+    return scope.Close(Integer::New(
+      TorrentInfoWrap::Unwrap(args.This())->piece_length()));
+  };
+
+  Handle<Value> TorrentInfoWrap::num_pieces(const Arguments& args) {
+    HandleScope scope;
+    return scope.Close(Integer::New(
+      TorrentInfoWrap::Unwrap(args.This())->num_pieces()));
+  };
+
+
+  Handle<Value> TorrentInfoWrap::hash_for_piece(const Arguments& args) {
+    HandleScope scope;
+    libtorrent::sha1_hash hash;
+    hash = TorrentInfoWrap::Unwrap(args.This())->hash_for_piece(args[0]->IntegerValue());
+    return scope.Close(String::New(libtorrent::to_hex(hash.to_string()).c_str()));
+  };
+
+  Handle<Value> TorrentInfoWrap::merkle_tree(const Arguments& args) {
+    HandleScope scope;
+
+    std::vector<libtorrent::sha1_hash> t;
+    t = TorrentInfoWrap::Unwrap(args.This())->merkle_tree();
+    Local<Array> ret = Array::New();
+    for (std::vector<libtorrent::sha1_hash>::iterator
+         i(t.begin()), e(t.end()); i != e; ++i)
+      ret->Set(ret->Length(), String::New(libtorrent::to_hex(i->to_string()).c_str()));
+    return scope.Close(ret);
+  };
+
+  Handle<Value> TorrentInfoWrap::set_merkle_tree(const Arguments& args) {
+    HandleScope scope;
+
+    std::vector<libtorrent::sha1_hash> arg;
+    Local<Array> t = Array::New();
+    for (uint32_t i(0), e(t->Length()); i < e; ++i) {
+      libtorrent::sha1_hash h;
+      libtorrent::from_hex(*String::AsciiValue(t->Get(0)), 40, (char*)&h[0]);
+      arg.push_back(h);
+    }
+    TorrentInfoWrap::Unwrap(args.This())->set_merkle_tree(arg);
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentInfoWrap::piece_size(const Arguments& args) {
+    HandleScope scope;
+    return scope.Close(Integer::New(
+      TorrentInfoWrap::Unwrap(args.This())->piece_size(args[0]->IntegerValue())));
+  };
+
+
+  Handle<Value> TorrentInfoWrap::num_files(const Arguments& args) {
+    HandleScope scope;
+    return scope.Close(Integer::New(
+      TorrentInfoWrap::Unwrap(args.This())->num_files()));
+  };
+
+  Handle<Value> TorrentInfoWrap::file_at(const Arguments& args) {
+    HandleScope scope;
+    return scope.Close(file_entry_to_object(
+      TorrentInfoWrap::Unwrap(args.This())->file_at(args[0]->IntegerValue())));
+  };
+
+  Handle<Value> TorrentInfoWrap::files(const Arguments& args) {
+    HandleScope scope;
+    return scope.Close(FileStorageWrap::New(
+      TorrentInfoWrap::Unwrap(args.This())->files()));
+  };
+
+  Handle<Value> TorrentInfoWrap::orig_files(const Arguments& args) {
+    HandleScope scope;
+    return scope.Close(FileStorageWrap::New(
+      TorrentInfoWrap::Unwrap(args.This())->orig_files()));
+  };
+
+  Handle<Value> TorrentInfoWrap::rename_file(const Arguments& args) {
+    HandleScope scope;
+    TorrentInfoWrap::Unwrap(args.This())->rename_file(
+      args[0]->IntegerValue(),
+      std::string(*String::AsciiValue(args[1])));
+    return scope.Close(Undefined());
+  };
+
+
+  Handle<Value> TorrentInfoWrap::priv(const Arguments& args) {
+    HandleScope scope;
+    return scope.Close(Boolean::New(
+      TorrentInfoWrap::Unwrap(args.This())->priv()));
+  };
+
+  Handle<Value> TorrentInfoWrap::trackers(const Arguments& args) {
+    HandleScope scope;
+
+    std::vector<libtorrent::announce_entry> t;
+    t = TorrentInfoWrap::Unwrap(args.This())->trackers();
+    Local<Array> ret = Array::New();
+    for (std::vector<libtorrent::announce_entry>::iterator
+         i(t.begin()), e(t.end()); i != e; ++i)
+      ret->Set(ret->Length(), announce_entry_to_object(*i));
+    return scope.Close(ret);
+  };
+
+
+  Handle<Value> TorrentInfoWrap::creation_date(const Arguments& args) {
+    HandleScope scope;
+    return scope.Close(Date::New(
+      ((double) *TorrentInfoWrap::Unwrap(args.This())->creation_date())*1000));
+  };
+
+
+  Handle<Value> TorrentInfoWrap::add_node(const Arguments& args) {
+    HandleScope scope;
+    TorrentInfoWrap::Unwrap(args.This())->add_node(std::make_pair(
+      std::string(*String::AsciiValue(args[0])),
+      args[1]->IntegerValue()));
+    return scope.Close(Undefined());
+  };
+
+  Handle<Value> TorrentInfoWrap::nodes(const Arguments& args) {
+    HandleScope scope;
+    
+    std::vector<std::pair<std::string, int> > ns;
+    ns = TorrentInfoWrap::Unwrap(args.This())->nodes();
+    Local<Array> ret = Array::New();
+    for (std::vector<std::pair<std::string, int> >::iterator
+         i(ns.begin()), e(ns.end()); i != e; ++i) {
+      Local<Array> obj = Array::New();
+      obj->Set(0, String::New(i->first.c_str()));
+      obj->Set(1, Integer::New(i->second));
+      ret->Set(ret->Length(), obj);
+    }
+    return scope.Close(ret);
+  };
+
+  Handle<Value> TorrentInfoWrap::metadata(const Arguments& args) {
+    HandleScope scope;
+    return scope.Close(String::New(
+      &TorrentInfoWrap::Unwrap(args.This())->metadata()[0]));
+  };
+
+  Handle<Value> TorrentInfoWrap::metadata_size(const Arguments& args) {
+    HandleScope scope;
+    return scope.Close(Integer::New(
+      TorrentInfoWrap::Unwrap(args.This())->metadata_size()));
+  };
+
+  Handle<Value> TorrentInfoWrap::map_block(const Arguments& args) {
+    HandleScope scope;
+
+    std::vector<libtorrent::file_slice> res;
+    res = TorrentInfoWrap::Unwrap(args.This())->map_block(args[0]->IntegerValue(),
+      args[1]->IntegerValue(), args[2]->IntegerValue());
+    Local<Array> ret = Array::New();
+    for (std::vector<libtorrent::file_slice>::iterator
+         i(res.begin()), e(res.end()); i != e; ++i)
+      ret->Set(ret->Length(), file_slice_to_object(*i));
+    return scope.Close(ret);
+  };
+
+  Handle<Value> TorrentInfoWrap::map_file(const Arguments& args) {
+    HandleScope scope;
+    
+    libtorrent::peer_request res;
+    res = TorrentInfoWrap::Unwrap(args.This())->map_file(args[0]->IntegerValue(),
+      args[1]->IntegerValue(), args[2]->IntegerValue());
+    Local<Object> ret = Object::New();
+    ret->Set(String::NewSymbol("piece"), Integer::New(res.piece));
+    ret->Set(String::NewSymbol("start"), Integer::New(res.start));
+    ret->Set(String::NewSymbol("length"), Integer::New(res.length));
+    return scope.Close(ret);
+  };
 
 
   v8::Local<v8::Object> announce_entry_to_object(const libtorrent::announce_entry& ae) {
@@ -218,5 +468,16 @@ namespace nodelt {
 
   void bind_torrent_info(Handle<Object> target) {
     TorrentInfoWrap::Initialize(target);
+
+    Local<Object> tracker_source = Object::New();
+    tracker_source->Set(String::NewSymbol("source_torrent"),
+      Integer::New(libtorrent::announce_entry::source_torrent));
+    tracker_source->Set(String::NewSymbol("source_client"),
+      Integer::New(libtorrent::announce_entry::source_client));
+    tracker_source->Set(String::NewSymbol("source_magnet_link"),
+      Integer::New(libtorrent::announce_entry::source_magnet_link));
+    tracker_source->Set(String::NewSymbol("source_tex"),
+      Integer::New(libtorrent::announce_entry::source_tex));
+    target->Set(String::NewSymbol("tracker_source"), tracker_source);
   };
 }; // namespace nodelt
