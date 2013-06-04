@@ -364,88 +364,99 @@ namespace nodelt {
 
   Handle<Value> TorrentHandleWrap::set_metadata(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    
+    std::string md(*String::AsciiValue(args[0]));
+    TorrentHandleWrap::Unwrap(args.This())->set_metadata(md.c_str(), md.size());
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::is_valid(const Arguments& args) {
     HandleScope scope;
-    // TODO
-    return scope.Close(Undefined());
+    return scope.Close(Boolean::New(
+      TorrentHandleWrap::Unwrap(args.This())->is_valid()));
   };
 
   Handle<Value> TorrentHandleWrap::pause(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    if (args.Length() == 1)
+      TorrentHandleWrap::Unwrap(args.This())->pause(args[0]->IntegerValue());
+    else
+      TorrentHandleWrap::Unwrap(args.This())->pause();
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::resume(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->resume();
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::clear_error(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->clear_error();
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::set_priority(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->set_priority(args[0]->IntegerValue());
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::super_seeding(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->super_seeding(args[0]->BooleanValue());
     return scope.Close(Undefined());
   };
 
 
   Handle<Value> TorrentHandleWrap::auto_managed(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->auto_managed(args[0]->BooleanValue());
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::queue_position(const Arguments& args) {
     HandleScope scope;
-    // TODO
-    return scope.Close(Undefined());
+    return scope.Close(Integer::New(
+      TorrentHandleWrap::Unwrap(args.This())->queue_position()));
   };
 
   Handle<Value> TorrentHandleWrap::queue_position_up(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->queue_position_up();
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::queue_position_down(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->queue_position_down();
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::queue_position_top(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->queue_position_top();
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::queue_position_bottom(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->queue_position_bottom();
     return scope.Close(Undefined());
   };
 
 #ifndef TORRENT_DISABLE_RESOLVE_COUNTRIES
   Handle<Value> TorrentHandleWrap::resolve_countries(const Arguments& args) {
     HandleScope scope;
-    // TODO
-    return scope.Close(Undefined());
+
+    if (args.Length() == 1) {
+      TorrentHandleWrap::Unwrap(args.This())->resolve_countries(args[0]->BooleanValue());
+      return scope.Close(Undefined());
+    } else {
+      return scope.Close(Boolean::New(
+        TorrentHandleWrap::Unwrap(args.This())->resolve_countries()));
+    }
   };
 #endif
 
@@ -475,123 +486,169 @@ namespace nodelt {
 
   Handle<Value> TorrentHandleWrap::set_piece_deadline(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    libtorrent::torrent_handle* th = TorrentHandleWrap::Unwrap(args.This());
+    int index = args[0]->IntegerValue(), deadline = args[1]->IntegerValue();
+    if (args.Length() == 3)
+      th->set_piece_deadline(index, deadline, args[2]->IntegerValue());
+    else
+      th->set_piece_deadline(index, deadline);
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::reset_piece_deadline(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->reset_piece_deadline(
+      args[0]->IntegerValue());
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::piece_availability(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    
+    std::vector<int> a;
+    Local<Array> avail = Array::Cast(*args[0]);
+    for (uint32_t i(0), e(avail->Length()); i < e; ++i)
+      a.push_back(avail->Get(i)->IntegerValue());
+    TorrentHandleWrap::Unwrap(args.This())->piece_availability(a);
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::piece_priority(const Arguments& args) {
     HandleScope scope;
-    // TODO
-    return scope.Close(Undefined());
+
+    libtorrent::torrent_handle* th = TorrentHandleWrap::Unwrap(args.This());
+    if (args.Length() == 2) {
+      th->piece_priority(args[0]->IntegerValue(), args[1]->IntegerValue());
+      return scope.Close(Undefined());
+    } else {
+      return scope.Close(Integer::New(th->piece_priority(args[0]->IntegerValue())));
+    }
   };
 
   Handle<Value> TorrentHandleWrap::prioritize_pieces(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    
+    std::vector<int> p;
+    Local<Array> pieces = Array::Cast(*args[0]);
+    for (uint32_t i(0), e(pieces->Length()); i < e; ++i)
+      p.push_back(pieces->Get(i)->IntegerValue());
+    TorrentHandleWrap::Unwrap(args.This())->prioritize_pieces(p);
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::piece_priorities(const Arguments& args) {
     HandleScope scope;
-    // TODO
-    return scope.Close(Undefined());
+    
+    std::vector<int> p(TorrentHandleWrap::Unwrap(args.This())->piece_priorities());
+    Local<Array> ret = Array::New();
+    for (std::vector<int>::iterator i(p.begin()), e(p.end()); i != e; ++i)
+      ret->Set(ret->Length(), Integer::New(*i));
+    return scope.Close(ret);
   };
 
   Handle<Value> TorrentHandleWrap::prioritize_files(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    
+    std::vector<int> f;
+    Local<Array> files = Array::Cast(*args[0]);
+    for (uint32_t i(0), e(files->Length()); i < e; ++i)
+      f.push_back(files->Get(i)->IntegerValue());
+    TorrentHandleWrap::Unwrap(args.This())->prioritize_files(f);
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::file_priorities(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    
+    std::vector<int> f(TorrentHandleWrap::Unwrap(args.This())->file_priorities());
+    Local<Array> ret = Array::New();
+    for (std::vector<int>::iterator i(f.begin()), e(f.end()); i != e; ++i)
+      ret->Set(ret->Length(), Integer::New(*i));
+    return scope.Close(ret);
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::file_priority(const Arguments& args) {
     HandleScope scope;
-    // TODO
+
+    libtorrent::torrent_handle* th = TorrentHandleWrap::Unwrap(args.This());
+    if (args.Length() == 2) {
+      th->file_priority(args[0]->IntegerValue(), args[1]->IntegerValue());
+      return scope.Close(Undefined());
+    } else {
+      return scope.Close(Integer::New(th->file_priority(args[0]->IntegerValue())));
+    }
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::use_interface(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->use_interface(*String::AsciiValue(args[0]));
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::save_resume_data(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    if (args.Length() == 1)
+      TorrentHandleWrap::Unwrap(args.This())->save_resume_data(args[0]->IntegerValue());
+    else
+      TorrentHandleWrap::Unwrap(args.This())->save_resume_data();
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::need_save_resume_data(const Arguments& args) {
     HandleScope scope;
-    // TODO
-    return scope.Close(Undefined());
+    return scope.Close(Boolean::New(
+      TorrentHandleWrap::Unwrap(args.This())->need_save_resume_data()));
   };
 
   Handle<Value> TorrentHandleWrap::force_reannounce(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->force_reannounce();
     return scope.Close(Undefined());
   };
 
 #ifndef TORRENT_DISABLE_DHT
   Handle<Value> TorrentHandleWrap::force_dht_announce(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->force_dht_announce();
     return scope.Close(Undefined());
   };
 #endif
 
   Handle<Value> TorrentHandleWrap::scrape_tracker(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->scrape_tracker();
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::name(const Arguments& args) {
     HandleScope scope;
-    // TODO
-    return scope.Close(Undefined());
+    return scope.Close(String::New(
+      TorrentHandleWrap::Unwrap(args.This())->name().c_str()));
   };
 
   Handle<Value> TorrentHandleWrap::set_upload_mode(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->set_upload_mode(args[0]->BooleanValue());
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::set_share_mode(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->set_share_mode(args[0]->BooleanValue());
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::flush_cache(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->flush_cache();
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::apply_ip_filter(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->apply_ip_filter(args[0]->BooleanValue());
     return scope.Close(Undefined());
   };
 
@@ -631,79 +688,102 @@ namespace nodelt {
 
   Handle<Value> TorrentHandleWrap::set_sequential_download(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->set_sequential_download(args[0]->BooleanValue());
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::connect_peer(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    
+    libtorrent::torrent_handle* th = TorrentHandleWrap::Unwrap(args.This());
+    Local<Array> arg0 = Array::Cast(*args[0]);
+    libtorrent::tcp::endpoint ip(
+      libtorrent::address::from_string(std::string(*String::AsciiValue(arg0->Get(0)))),
+      arg0->Get(0)->IntegerValue());
+    if (args.Length() == 2)
+      th->connect_peer(ip, args[1]->IntegerValue());
+    else
+      th->connect_peer(ip);
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::save_path(const Arguments& args) {
     HandleScope scope;
-    // TODO
-    return scope.Close(Undefined());
+    return scope.Close(String::New(
+      TorrentHandleWrap::Unwrap(args.This())->save_path().c_str()));
   };
 
   Handle<Value> TorrentHandleWrap::set_max_uploads(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->set_max_uploads(args[0]->IntegerValue());
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::max_uploads(const Arguments& args) {
     HandleScope scope;
-    // TODO
-    return scope.Close(Undefined());
+    return scope.Close(Integer::New(
+      TorrentHandleWrap::Unwrap(args.This())->max_uploads()));
   };
 
   Handle<Value> TorrentHandleWrap::set_max_connections(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->set_max_connections(args[0]->IntegerValue());
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::max_connections(const Arguments& args) {
     HandleScope scope;
-    // TODO
-    return scope.Close(Undefined());
+    return scope.Close(Integer::New(
+      TorrentHandleWrap::Unwrap(args.This())->max_connections()));
   };
 
   Handle<Value> TorrentHandleWrap::set_tracker_login(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->set_tracker_login(
+      std::string(*String::AsciiValue(args[0])),
+      std::string(*String::AsciiValue(args[1])));
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::move_storage(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->move_storage(
+      std::string(*String::AsciiValue(args[0])));
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::info_hash(const Arguments& args) {
     HandleScope scope;
-    // TODO
-    return scope.Close(Undefined());
+    libtorrent::sha1_hash h(TorrentHandleWrap::Unwrap(args.This())->info_hash());
+    return scope.Close(String::New(libtorrent::to_hex(h.to_string()).c_str()));
   };
 
   Handle<Value> TorrentHandleWrap::force_recheck(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->force_recheck();
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::rename_file(const Arguments& args) {
     HandleScope scope;
-    // TODO
+    TorrentHandleWrap::Unwrap(args.This())->rename_file(args[0]->IntegerValue(),
+      std::string(*String::AsciiValue(args[1])));
     return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::set_ssl_certificate(const Arguments& args) {
     HandleScope scope;
-    // TODO
+
+    libtorrent::torrent_handle* th = TorrentHandleWrap::Unwrap(args.This());
+    std::string
+      certificate(*String::AsciiValue(args[0])),
+      private_key(*String::AsciiValue(args[1])),
+      dh_params(*String::AsciiValue(args[2]));
+    if (args.Length() == 4)
+      th->set_ssl_certificate(certificate, private_key, dh_params,
+        std::string(*String::AsciiValue(args[3])));
+    else
+      th->set_ssl_certificate(certificate, private_key, dh_params);
     return scope.Close(Undefined());
   };
 
