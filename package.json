@@ -1,7 +1,7 @@
 {
   "name": "node-libtorrent",
   "description": "rb-libtorrent bindings for node.js",
-  "author": "Fomichev Kirill <fanatid@ya.ru>",
+  "author": "Kirill Fomichev <fanatid@ya.ru>",
   "homepage": "http://fanatid.github.io/node-libtorrent/",
   "repository": {
     "type": "git",
@@ -10,16 +10,18 @@
   "bugs": {
     "url": "https://github.com/fanatid/node-libtorrent/issues"
   },
+  "main": "./lib/libtorrent.js",
   "version": "0.0.1",
   "engines": {
     "node": ">= 0.8.0"
   },
-  "dependencies": {
-    "grunt": ">= 0.4",
-    "underscore": ">= 1.0.0"
-  },
+  "dependencies": {},
   "scripts": {
     "install": "node-gyp rebuild",
     "test": "jasmine-node --coffee spec/"
-  }
+  },
+  "keywords": [
+    "libtorrent",
+    "torrents"
+  ]
 }
