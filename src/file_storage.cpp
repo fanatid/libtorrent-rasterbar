@@ -60,6 +60,7 @@ namespace nodelt {
     return e;
   };
 
+  Persistent<Function> FileStorageWrap::constructor;
 
   void FileStorageWrap::Initialize(Handle<Object> target) {
     Local<FunctionTemplate> tpl = FunctionTemplate::New(NewInstance);
@@ -95,6 +96,8 @@ namespace nodelt {
 
     target->Set(String::NewSymbol("file_storage"),
       Persistent<Function>::New(tpl->GetFunction()));
+
+    constructor = Persistent<Function>::New(tpl->GetFunction());
   };
 
   FileStorageWrap::FileStorageWrap() {
@@ -116,6 +119,16 @@ namespace nodelt {
     fs->Wrap(args.This());
 
     return scope.Close(args.This());
+  };
+
+  Local<Object> FileStorageWrap::New(const libtorrent::file_storage& fs) {
+    HandleScope scope;
+
+    Local<Object> obj = constructor->NewInstance();
+    delete FileStorageWrap::Unwrap(obj);
+    ObjectWrap::Unwrap<FileStorageWrap>(obj)->obj_ = new libtorrent::file_storage(fs);
+
+    return scope.Close(obj);
   };
 
   Handle<Value> FileStorageWrap::add_file(const Arguments& args) {
