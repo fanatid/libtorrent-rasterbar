@@ -11,7 +11,7 @@
     "url": "https://github.com/fanatid/node-libtorrent/issues"
   },
   "main": "./lib/libtorrent.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "node": ">= 0.8.0"
   },
@@ -29,5 +29,5 @@
   "directories": {
     "example": "examples"
   },
-  "license": "BSD"
+  "license": "MIT"
 }
