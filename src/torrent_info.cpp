@@ -41,6 +41,8 @@ namespace nodelt {
       FunctionTemplate::New(piece_length)->GetFunction());
     tpl->PrototypeTemplate()->Set(String::NewSymbol("num_pieces"),
       FunctionTemplate::New(num_pieces)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("info_hash"),
+      FunctionTemplate::New(info_hash)->GetFunction());
 
     tpl->PrototypeTemplate()->Set(String::NewSymbol("hash_for_piece"),
       FunctionTemplate::New(hash_for_piece)->GetFunction());
@@ -269,6 +271,11 @@ namespace nodelt {
       TorrentInfoWrap::Unwrap(args.This())->num_pieces()));
   };
 
+  Handle<Value> TorrentInfoWrap::info_hash(const Arguments& args) {
+    HandleScope scope;
+    libtorrent::sha1_hash h(TorrentInfoWrap::Unwrap(args.This())->info_hash());
+    return scope.Close(String::New(libtorrent::to_hex(h.to_string()).c_str()));
+  };
 
   Handle<Value> TorrentInfoWrap::hash_for_piece(const Arguments& args) {
     HandleScope scope;

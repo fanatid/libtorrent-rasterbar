@@ -36,6 +36,7 @@ namespace nodelt {
       static v8::Handle<v8::Value> total_size(const v8::Arguments& args);
       static v8::Handle<v8::Value> piece_length(const v8::Arguments& args);
       static v8::Handle<v8::Value> num_pieces(const v8::Arguments& args);
+      static v8::Handle<v8::Value> info_hash(const v8::Arguments& args);
 
       static v8::Handle<v8::Value> hash_for_piece(const v8::Arguments& args);
       static v8::Handle<v8::Value> merkle_tree(const v8::Arguments& args);
