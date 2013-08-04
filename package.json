@@ -1,14 +1,14 @@
 {
-  "name": "node-libtorrent",
-  "description": "rb-libtorrent bindings for node.js",
-  "author": "Kirill Fomichev <fanatid@ya.ru>",
-  "homepage": "http://fanatid.github.io/node-libtorrent/",
+  "name": "node-libtorrent-mt",
+  "description": "rb-libtorrent bindings for node.js (fork with fixes)",
+  "author": "Martin Trojer <martin.trojer@gmail.com>",
+  "homepage": "http://github.com/martintrojer/node-libtorrent",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fanatid/node-libtorrent.git"
+    "url": "http://github.com/martintrojer/node-libtorrent.git"
   },
   "bugs": {
-    "url": "https://github.com/fanatid/node-libtorrent/issues"
+    "url": "http://github.com/martintrojer/node-libtorrent/issues"
   },
   "main": "./lib/libtorrent.js",
   "version": "0.0.3",
