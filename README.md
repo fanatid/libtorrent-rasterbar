@@ -2,7 +2,7 @@
 
 node-libtorrent provides native bindings to [libtorrent rastebar](http://www.rasterbar.com/products/libtorrent/) as a [Node.js addon](http://nodejs.org/docs/latest/api/addons.html).
 
-this is a for of https://github.com/fanatid/node-libtorrent
+this is a fork of https://github.com/fanatid/node-libtorrent
 
 # Getting started
 Execute in command line:
