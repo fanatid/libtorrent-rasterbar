@@ -2,13 +2,13 @@
   "name": "node-libtorrent-mt",
   "description": "rb-libtorrent bindings for node.js (fork with fixes)",
   "author": "Martin Trojer <martin.trojer@gmail.com>",
-  "homepage": "http://github.com/martintrojer/node-libtorrent",
+  "homepage": "https://github.com/martintrojer/node-libtorrent",
   "repository": {
     "type": "git",
-    "url": "http://github.com/martintrojer/node-libtorrent.git"
+    "url": "https://github.com/martintrojer/node-libtorrent.git"
   },
   "bugs": {
-    "url": "http://github.com/martintrojer/node-libtorrent/issues"
+    "url": "https://github.com/martintrojer/node-libtorrent/issues"
   },
   "main": "./lib/libtorrent.js",
   "version": "0.0.3",
