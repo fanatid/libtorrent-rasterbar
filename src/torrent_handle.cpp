@@ -565,7 +565,6 @@ namespace nodelt {
     for (std::vector<int>::iterator i(f.begin()), e(f.end()); i != e; ++i)
       ret->Set(ret->Length(), Integer::New(*i));
     return scope.Close(ret);
-    return scope.Close(Undefined());
   };
 
   Handle<Value> TorrentHandleWrap::file_priority(const Arguments& args) {
