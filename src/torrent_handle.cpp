@@ -358,7 +358,7 @@ namespace nodelt {
 
   Handle<Value> TorrentHandleWrap::get_torrent_info(const Arguments& args) {
     HandleScope scope;
-    libtorrent::torrent_info ti = TorrentHandleWrap::Unwrap(args.This())->get_torrent_info();
+    libtorrent::torrent_info ti = *TorrentHandleWrap::Unwrap(args.This())->torrent_file().get();
     return scope.Close(TorrentInfoWrap::New(ti));
   };
 
