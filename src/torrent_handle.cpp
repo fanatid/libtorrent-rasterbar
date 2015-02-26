@@ -51,6 +51,8 @@ namespace nodelt {
       FunctionTemplate::New(get_torrent_info)->GetFunction());
     tpl->PrototypeTemplate()->Set(String::NewSymbol("set_metadata"),
       FunctionTemplate::New(set_metadata)->GetFunction());
+    tpl->PrototypeTemplate()->Set(String::NewSymbol("has_metadata"),
+      FunctionTemplate::New(has_metadata)->GetFunction());
     tpl->PrototypeTemplate()->Set(String::NewSymbol("is_valid"),
       FunctionTemplate::New(is_valid)->GetFunction());
     tpl->PrototypeTemplate()->Set(String::NewSymbol("pause"),
@@ -374,6 +376,12 @@ namespace nodelt {
     HandleScope scope;
     return scope.Close(Boolean::New(
       TorrentHandleWrap::Unwrap(args.This())->is_valid()));
+  };
+  
+  Handle<Value> TorrentHandleWrap::has_metadata(const Arguments& args) {
+    HandleScope scope;
+    return scope.Close(Boolean::New(
+      TorrentHandleWrap::Unwrap(args.This())->has_metadata()));
   };
 
   Handle<Value> TorrentHandleWrap::pause(const Arguments& args) {
