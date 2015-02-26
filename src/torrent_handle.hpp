@@ -39,6 +39,7 @@ namespace nodelt {
       static v8::Handle<v8::Value> get_torrent_info(const v8::Arguments& args);
       static v8::Handle<v8::Value> set_metadata(const v8::Arguments& args);
       static v8::Handle<v8::Value> is_valid(const v8::Arguments& args);
+      static v8::Handle<v8::Value> has_metadata(const v8::Arguments& args);
       static v8::Handle<v8::Value> pause(const v8::Arguments& args);
       static v8::Handle<v8::Value> resume(const v8::Arguments& args);
       static v8::Handle<v8::Value> clear_error(const v8::Arguments& args);
