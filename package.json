@@ -1,33 +1,48 @@
 {
-  "name": "node-libtorrent",
-  "description": "rb-libtorrent bindings for node.js",
+  "name": "libtorrent-rasterbar",
+  "version": "1.0.0",
+  "description": "libtorrent.org bindings",
   "author": "Kirill Fomichev <fanatid@ya.ru>",
-  "homepage": "http://fanatid.github.io/node-libtorrent/",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/fanatid/node-libtorrent.git"
-  },
-  "bugs": {
-    "url": "https://github.com/fanatid/node-libtorrent/issues"
-  },
-  "main": "./lib/libtorrent.js",
-  "version": "0.0.2",
-  "engines": {
-    "node": ">= 0.8.0"
-  },
-  "dependencies": {},
-  "scripts": {
-    "install": "node-gyp rebuild",
-    "test": "jasmine-node --coffee spec/"
-  },
   "keywords": [
     "libtorrent",
     "torrents"
   ],
-  "readmeFilename": "README.md",
-  "gypfile": true,
-  "directories": {
-    "example": "examples"
+  "bugs": {
+    "url": "https://github.com/fanatid/libtorrent-rasterbar/issues"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "contributors": [
+    "Kirill Fomichev <fanatid@ya.ru> (https://github.com/fanatid)"
+  ],
+  "files": [
+    "src",
+    "binding.gyp",
+    "index.js"
+  ],
+  "main": "./index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fanatid/libtorrent-rasterbar.git"
+  },
+  "homepage": "http://fanatid.github.io/libtorrent-rasterbar/",
+  "scripts": {
+    "clean": "node-gyp clean",
+    "install": "npm run rebuild",
+    "lint": "standard",
+    "rebuild": "node-gyp rebuild",
+    "test": "npm run lint && npm run unit",
+    "unit": "echo \"No tests.\""
+  },
+  "dependencies": {
+    "bindings": "^1.2.1",
+    "nan": "^2.2.1"
+  },
+  "devDependencies": {
+    "node-gyp": "^3.3.1",
+    "standard": "*"
+  },
+  "engines": {
+    "node": ">=4"
+  },
+  "gypfile": true
 }
