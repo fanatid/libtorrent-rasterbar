@@ -1,25 +1,21 @@
 {
-  "targets": [{
-    "target_name": "libtorrent",
-    "sources": [
-      "./src/addon.cc"
+  'includes': [
+    './common.gypi'
+  ],
+  'target_defaults': {
+    'include_dirs': [
+      '<!(node -e "require(\'./include_dirs\')")'
     ],
-    "defines": [
-    ],
-    "include_dirs": [
-      "<!(node -e \"require('nan')\")"
-    ],
-    "cflags": [
-      "-Wall",
-      "-Wno-maybe-uninitialized",
-      "-Wno-uninitialized",
-      "-Wno-unused-function",
-      "-Wextra",
-      "-fPIC",
-      "`pkg-config --cflags libtorrent-rasterbar`"
-    ],
-    "libraries": [
-      "`pkg-config --libs libtorrent-rasterbar`"
+  },
+  'targets': [{
+    'type': 'loadable_module',
+    'target_name': 'libtorrent-rasterbar',
+    'product_name': 'libtorrent-rasterbar',
+    'sources': [
+      './src/addon.cc',
+
+      './src/extensions.cc',
+      './src/session.cc'
     ]
   }]
 }

@@ -15,8 +15,11 @@
     "Kirill Fomichev <fanatid@ya.ru> (https://github.com/fanatid)"
   ],
   "files": [
+    "include",
     "src",
     "binding.gyp",
+    "common.gypi",
+    "include_dirs.js",
     "index.js"
   ],
   "main": "./index.js",
@@ -26,12 +29,10 @@
   },
   "homepage": "http://fanatid.github.io/libtorrent-rasterbar/",
   "scripts": {
-    "clean": "node-gyp clean",
-    "install": "npm run rebuild",
+    "install": "node-gyp rebuild",
     "lint": "standard",
-    "rebuild": "node-gyp rebuild",
     "test": "npm run lint && npm run unit",
-    "unit": "echo \"No tests.\""
+    "unit": "tape test/index.js"
   },
   "dependencies": {
     "bindings": "^1.2.1",
@@ -39,7 +40,8 @@
   },
   "devDependencies": {
     "node-gyp": "^3.3.1",
-    "standard": "*"
+    "standard": "*",
+    "tape": "^4.6.3"
   },
   "engines": {
     "node": ">=4"

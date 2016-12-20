@@ -5,6 +5,10 @@
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
+Tested with [libtorrent 1.1.1][1]
+
 ## LICENSE
 
 This library is free and open-source software released under the MIT license.
+
+[1]: https://github.com/arvidn/libtorrent/tree/libtorrent-1_1_1

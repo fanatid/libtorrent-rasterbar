@@ -1,2 +1,2 @@
 'use strict'
-module.exports = require('bindings')('libtorrent')
+module.exports = require('bindings')('libtorrent-rasterbar')
