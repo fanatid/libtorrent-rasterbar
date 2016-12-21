@@ -1,3 +1,4 @@
+dist: trusty
 sudo: false
 language: node_js
 node_js:
@@ -8,18 +9,34 @@ node_js:
 addons:
   apt:
     sources:
+      - boost-latest
       - ubuntu-toolchain-r-test
     packages:
-      - clang-3.5
-      - g++-4.8
+      - gcc-6
+      - g++-6
+      - libboost1.55-all-dev
 env:
-  - CXX=g++-4.8 TEST_SUITE=unit
+  global:
+    - JOBS=2
+    - LIBTORRENT_BRANCH=libtorrent-1_1_1
+    - CC=gcc-6
+    - CXX=g++-6
+  matrix:
+    - TEST_SUITE=unit
 matrix:
+  fast_finish: true
   include:
     - os: linux
       node_js: "6"
-      env: CXX=g++-4.8 TEST_SUITE=lint
-    - os: linux
-      node_js: "6"
-      env: CXX=clang++ TEST_SUITE=unit
+      env: TEST_SUITE=lint
+before_install:
+  - git clone --depth 1 -b $LIBTORRENT_BRANCH https://github.com/arvidn/libtorrent.git
+  - cd libtorrent
+  - ./autotool.sh
+  - ./configure --prefix=$(pwd)/build --disable-static
+  - make -j $JOBS
+  - make install
+  - export PKG_CONFIG_PATH=$(pwd)/build/lib/pkgconfig:$PKG_CONFIG_PATH
+  - export LD_LIBRARY_PATH=$(pwd)/build/lib:$LD_LIBRARY_PATH
+install: npm install
 script: npm run $TEST_SUITE

@@ -9,11 +9,18 @@
       '-Wno-uninitialized',
       '-Wno-unused-function',
       '-Wextra',
-      '-fPIC',
-      '<!(pkg-config --cflags libtorrent-rasterbar)'
+      '-fPIC'
     ],
-    'libraries': [
-      '<!(pkg-config --libs libtorrent-rasterbar)'
+    'conditions': [
+      ['OS=="win"', {
+      }, {
+        'cflags': [
+          '<!(pkg-config --cflags libtorrent-rasterbar)'
+        ],
+        'libraries': [
+          '<!(pkg-config --libs libtorrent-rasterbar)'
+        ]
+      }]
     ]
   }
 }
