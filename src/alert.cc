@@ -1,4 +1,5 @@
 #include <libtorrent-rasterbar/alert.h>
+#include <libtorrent-rasterbar/macros.h>
 
 namespace libtorrent_rasterbar {
 
@@ -23,10 +24,10 @@ v8::Local<v8::Object> Alert::FromAlertPointer(libtorrent::alert* alert) {
 
   v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
   v8::Local<v8::Object> result = Nan::NewInstance(cons).ToLocalChecked();
-  Nan::Set(result, Nan::New("type").ToLocalChecked(), Nan::New(alert->type()));
-  Nan::Set(result, Nan::New("what").ToLocalChecked(), Nan::New(alert->what()).ToLocalChecked());
-  Nan::Set(result, Nan::New("message").ToLocalChecked(), Nan::New(alert->message().c_str()).ToLocalChecked());
-  Nan::Set(result, Nan::New("category").ToLocalChecked(), Nan::New(alert->category()));
+  SET_INTEGER(result, "type", alert->type());
+  SET_STRING(result, "what", alert->what());
+  SET_STRING(result, "message", alert->message().c_str());
+  SET_INTEGER(result, "category", alert->category());
 
   Alert* obj = Nan::ObjectWrap::Unwrap<Alert>(result);
   obj->alert = alert;

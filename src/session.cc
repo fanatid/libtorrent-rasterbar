@@ -4,6 +4,7 @@
 #include <libtorrent-rasterbar/alert.h>
 #include <libtorrent-rasterbar/extensions.h>
 #include <libtorrent-rasterbar/session.h>
+#include <libtorrent-rasterbar/macros.h>
 
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
@@ -69,11 +70,11 @@ NAN_METHOD(Session::AddExtension) {
 #endif // TORRENT_DISABLE_EXTENSIONS
 
 NAN_METHOD(Session::PopAlerts) {
-  if (!info[0]->IsNumber()) return Nan::ThrowTypeError("Expected count as number");
-  if (info[0]->IntegerValue() == 0) return Nan::ThrowRangeError("Expected count more than zero");
+  REQUIRE_ARGUMENT_NUMBER(0, count);
+  if (count == 0) return Nan::ThrowRangeError("Argument 0 must be more than zero");
 
   Session* obj = Nan::ObjectWrap::Unwrap<Session>(info.Holder());
-  std::vector<libtorrent::alert*> alerts(info[0]->IntegerValue());
+  std::vector<libtorrent::alert*> alerts(count);
   obj->session->pop_alerts(&alerts);
 
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
@@ -93,11 +94,11 @@ void AlertNotify(Session* obj) {
 }
 
 NAN_METHOD(Session::SetAlertNotify) {
-  if (!info[0]->IsFunction()) return Nan::ThrowTypeError("Expected callback as function");
+  REQUIRE_ARGUMENT_FUNCTION(0, callback);
 
   Session* obj = Nan::ObjectWrap::Unwrap<Session>(info.Holder());
   if (obj->fnAlertNotify.IsEmpty()) obj->session->set_alert_notify(boost::bind(AlertNotify, obj));
-  obj->fnAlertNotify.Reset(v8::Local<v8::Function>::Cast(info[0]));
+  obj->fnAlertNotify.Reset(callback);
 }
 
 } // namespace libtorrent_rasterbar
