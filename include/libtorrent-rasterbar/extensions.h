@@ -1,6 +1,8 @@
 #ifndef LIBTORRENT_RASTERBAR_EXTENSIONS_H_
 #define LIBTORRENT_RASTERBAR_EXTENSIONS_H_
 
+#ifndef TORRENT_DISABLE_EXTENSIONS
+
 #include <nan.h>
 #include <libtorrent/extensions.hpp>
 
@@ -23,4 +25,6 @@ class PluginStorage : public Nan::ObjectWrap {
 
 } // namespace libtorrent_rasterbar
 
-#endif
+#endif // TORRENT_DISABLE_EXTENSIONS
+
+#endif // LIBTORRENT_RASTERBAR_EXTENSIONS_H_

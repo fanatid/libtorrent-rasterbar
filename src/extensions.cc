@@ -1,5 +1,7 @@
 #include <libtorrent-rasterbar/extensions.h>
 
+#ifndef TORRENT_DISABLE_EXTENSIONS
+
 namespace libtorrent_rasterbar {
 
 Nan::Persistent<v8::FunctionTemplate> PluginStorage::prototype;
@@ -27,3 +29,5 @@ NAN_METHOD(PluginStorage::New) {
 }
 
 } // namespace libtorrent_rasterbar
+
+#endif // TORRENT_DISABLE_EXTENSIONS

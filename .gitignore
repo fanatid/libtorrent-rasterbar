@@ -3,4 +3,5 @@ coverage
 build
 node_modules
 
+update-env.sh
 npm-debug.log

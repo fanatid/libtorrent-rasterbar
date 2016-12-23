@@ -3,7 +3,6 @@
 
 #include <nan.h>
 #include <libtorrent/session.hpp>
-#include <libtorrent-rasterbar/macros.h>
 
 namespace libtorrent_rasterbar {
 
@@ -27,4 +26,4 @@ class Session : public Nan::ObjectWrap {
 
 } // namespace libtorrent_rasterbar
 
-#endif
+#endif // LIBTORRENT_RASTERBAR_SESSION_H_

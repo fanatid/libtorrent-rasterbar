@@ -16,7 +16,9 @@ v8::Local<v8::Function> Session::Init() {
   tpl->SetClassName(Nan::New("Session").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
+#ifndef TORRENT_DISABLE_EXTENSIONS
   Nan::SetPrototypeMethod(tpl, "addExtension", AddExtension);
+#endif // TORRENT_DISABLE_EXTENSIONS
 
   Session::prototype.Reset(tpl);
   Session::constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
@@ -35,8 +37,8 @@ NAN_METHOD(Session::New) {
   info.GetReturnValue().Set(info.This());
 }
 
-NAN_METHOD(Session::AddExtension) {
 #ifndef TORRENT_DISABLE_EXTENSIONS
+NAN_METHOD(Session::AddExtension) {
   Session* obj = Nan::ObjectWrap::Unwrap<Session>(info.Holder());
 
   if (info[0]->IsString()) {
@@ -44,7 +46,7 @@ NAN_METHOD(Session::AddExtension) {
     if (name == "smart_ban") obj->session->add_extension(libtorrent::create_smart_ban_plugin);
     if (name == "ut_metadata") obj->session->add_extension(libtorrent::create_ut_metadata_plugin);
     if (name == "ut_pex") obj->session->add_extension(libtorrent::create_ut_pex_plugin);
-    return;
+    return Nan::ThrowError(("Unknow plugin name: " + name).c_str());
   }
 
   if (info[0]->IsObject()) {
@@ -56,8 +58,8 @@ NAN_METHOD(Session::AddExtension) {
     }
   }
 
-  Nan::ThrowTypeError("expected String or Plugin");
-#endif
+  Nan::ThrowTypeError("expected String or PluginStorage");
 }
+#endif // TORRENT_DISABLE_EXTENSIONS
 
 } // namespace libtorrent_rasterbar
