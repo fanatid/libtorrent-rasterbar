@@ -6,6 +6,24 @@
 
 namespace libtorrent_rasterbar {
 
+NAN_MODULE_INIT(InitFeatures) {
+  v8::Local<v8::Object> features = Nan::New<v8::Object>();
+
+#ifdef TORRENT_DISABLE_EXTENSIONS
+  Nan::Set(features, Nan::New("TORRENT_DISABLE_EXTENSIONS").ToLocalChecked(), Nan::New(true));
+#else
+  Nan::Set(features, Nan::New("TORRENT_DISABLE_EXTENSIONS").ToLocalChecked(), Nan::New(false));
+#endif
+
+#ifdef TORRENT_NO_DEPRECATE
+  Nan::Set(features, Nan::New("TORRENT_NO_DEPRECATE").ToLocalChecked(), Nan::New(true));
+#else
+  Nan::Set(features, Nan::New("TORRENT_NO_DEPRECATE").ToLocalChecked(), Nan::New(false));
+#endif
+
+  Nan::Set(target, Nan::New("features").ToLocalChecked(), features);
+}
+
 NAN_MODULE_INIT(Init) {
   v8::Local<v8::Object> alerts = Nan::New<v8::Object>();
   Nan::Set(alerts, Nan::New("Alert").ToLocalChecked(), Alert::Init());
@@ -23,6 +41,7 @@ NAN_MODULE_INIT(Init) {
   Nan::Set(target, Nan::New("Session").ToLocalChecked(), Session::Init());
 
   Nan::Set(target, Nan::New("version").ToLocalChecked(), Nan::New(LIBTORRENT_VERSION).ToLocalChecked());
+  InitFeatures(target);
 }
 
 NODE_MODULE(libtorrent, Init)
