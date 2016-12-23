@@ -3,8 +3,32 @@
 #include <libtorrent-rasterbar/alert.h>
 #include <libtorrent-rasterbar/extensions.h>
 #include <libtorrent-rasterbar/session.h>
+#include <libtorrent-rasterbar/settings_pack.h>
 
 namespace libtorrent_rasterbar {
+
+NAN_MODULE_INIT(InitAlerts) {
+  v8::Local<v8::Object> alerts = Nan::New<v8::Object>();
+  Nan::Set(alerts, Nan::New("Alert").ToLocalChecked(), Alert::Init());
+  Nan::Set(target, Nan::New("alerts").ToLocalChecked(), alerts);
+}
+
+NAN_MODULE_INIT(InitExtensions) {
+#ifndef TORRENT_DISABLE_EXTENSIONS
+  v8::Local<v8::Object> extensions = Nan::New<v8::Object>();
+  Nan::Set(extensions, Nan::New("SmartBan").ToLocalChecked(), Nan::New("smart_ban").ToLocalChecked());
+  Nan::Set(extensions, Nan::New("UTMetadata").ToLocalChecked(), Nan::New("ut_metadata").ToLocalChecked());
+  Nan::Set(extensions, Nan::New("UTPex").ToLocalChecked(), Nan::New("ut_pex").ToLocalChecked());
+  Nan::Set(extensions, Nan::New("Plugin").ToLocalChecked(), Plugin::Init());
+  Nan::Set(target, Nan::New("extensions").ToLocalChecked(), extensions);
+#endif // TORRENT_DISABLE_EXTENSIONS
+}
+
+NAN_MODULE_INIT(InitSettings) {
+  v8::Local<v8::Object> settings = Nan::New<v8::Object>();
+  Nan::Set(settings, Nan::New("SettingsPack").ToLocalChecked(), SettingsPack::Init());
+  Nan::Set(target, Nan::New("settings").ToLocalChecked(), settings);
+}
 
 NAN_MODULE_INIT(InitFeatures) {
   v8::Local<v8::Object> features = Nan::New<v8::Object>();
@@ -25,20 +49,10 @@ NAN_MODULE_INIT(InitFeatures) {
 }
 
 NAN_MODULE_INIT(Init) {
-  v8::Local<v8::Object> alerts = Nan::New<v8::Object>();
-  Nan::Set(alerts, Nan::New("Alert").ToLocalChecked(), Alert::Init());
-  Nan::Set(target, Nan::New("alerts").ToLocalChecked(), alerts);
-
-#ifndef TORRENT_DISABLE_EXTENSIONS
-  v8::Local<v8::Object> extensions = Nan::New<v8::Object>();
-  Nan::Set(extensions, Nan::New("SmartBan").ToLocalChecked(), Nan::New("smart_ban").ToLocalChecked());
-  Nan::Set(extensions, Nan::New("UTMetadata").ToLocalChecked(), Nan::New("ut_metadata").ToLocalChecked());
-  Nan::Set(extensions, Nan::New("UTPex").ToLocalChecked(), Nan::New("ut_pex").ToLocalChecked());
-  Nan::Set(extensions, Nan::New("Plugin").ToLocalChecked(), Plugin::Init());
-  Nan::Set(target, Nan::New("extensions").ToLocalChecked(), extensions);
-#endif // TORRENT_DISABLE_EXTENSIONS
-
+  InitAlerts(target);
+  InitExtensions(target);
   Nan::Set(target, Nan::New("Session").ToLocalChecked(), Session::Init());
+  InitSettings(target);
 
   Nan::Set(target, Nan::New("version").ToLocalChecked(), Nan::New(LIBTORRENT_VERSION).ToLocalChecked());
   InitFeatures(target);
