@@ -8,7 +8,7 @@
 
 namespace libtorrent_rasterbar {
 
-class PluginStorage : public Nan::ObjectWrap {
+class Plugin : public Nan::ObjectWrap {
  public:
   static v8::Local<v8::Function> Init();
   static Nan::Persistent<v8::FunctionTemplate> prototype;

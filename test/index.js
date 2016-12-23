@@ -1,7 +1,8 @@
 'use strict'
-const filenames = [
-  // tests with other node module
-  'session_add_extension_plugin'
+const DEFAULT_FILENAMES = [
+  'session_add_extension_plugin',
+  'session_pop_alerts'
 ]
 
+const filenames = process.env.FILENAMES && process.env.FILENAMES.split(',') || DEFAULT_FILENAMES
 for (let filename of filenames) require(`./${filename}`)

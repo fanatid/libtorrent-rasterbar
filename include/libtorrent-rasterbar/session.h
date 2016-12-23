@@ -12,6 +12,8 @@ class Session : public Nan::ObjectWrap {
   static Nan::Persistent<v8::FunctionTemplate> prototype;
   static Nan::Persistent<v8::Function> constructor;
 
+  Nan::Persistent<v8::Function> fnAlertNotify;
+
  private:
   libtorrent::session* session;
 
@@ -22,6 +24,8 @@ class Session : public Nan::ObjectWrap {
 
   static NAN_METHOD(New);
   static NAN_METHOD(AddExtension);
+  static NAN_METHOD(PopAlerts);
+  static NAN_METHOD(SetAlertNotify);
 };
 
 } // namespace libtorrent_rasterbar
