@@ -3,6 +3,7 @@
 #include <libtorrent-rasterbar/alert.h>
 #include <libtorrent-rasterbar/extensions.h>
 #include <libtorrent-rasterbar/session.h>
+#include <libtorrent-rasterbar/settings.h>
 #include <libtorrent-rasterbar/settings_pack.h>
 #include <libtorrent-rasterbar/macros.h>
 
@@ -28,6 +29,8 @@ NAN_MODULE_INIT(InitExtensions) {
 NAN_MODULE_INIT(InitSettings) {
   v8::Local<v8::Object> settings = Nan::New<v8::Object>();
   SET_VALUE(settings, "SettingsPack", SettingsPack::Init());
+  SET_FUNCTION(settings, "settingByName", SettingByName);
+  SET_FUNCTION(settings, "nameForSetting", NameForSetting);
   SET_VALUE(target, "settings", settings);
 }
 

@@ -29,12 +29,15 @@
   Nan::Set(target, Nan::New(key).ToLocalChecked(), value);
 
 #define SET_STRING(target, key, value)                                        \
-  Nan::Set(target, Nan::New(key).ToLocalChecked(), Nan::New(value).ToLocalChecked());
+  SET_VALUE(target, key, Nan::New(value).ToLocalChecked());
 
 #define SET_BOOLEAN(target, key, value)                                       \
-  Nan::Set(target, Nan::New(key).ToLocalChecked(), Nan::New(value));
+  SET_VALUE(target, key, Nan::New(value));
 
 #define SET_INTEGER(target, key, value)                                       \
-  Nan::Set(target, Nan::New(key).ToLocalChecked(), Nan::New(value));
+  SET_VALUE(target, key, Nan::New(value));
+
+#define SET_FUNCTION(target, key, value)                                      \
+  SET_VALUE(target, key, Nan::New<v8::Function>(value));
 
 #endif // LIBTORRENT_RASTERBAR_MACROS_H_

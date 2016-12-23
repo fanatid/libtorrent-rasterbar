@@ -2,6 +2,7 @@
 const DEFAULT_FILENAMES = [
   'session_add_extension_plugin',
   'session_pop_alerts',
+  'settings',
   'settings_pack'
 ]
 

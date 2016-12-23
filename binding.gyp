@@ -17,6 +17,7 @@
       './src/alert.cc',
       './src/extensions.cc',
       './src/session.cc',
+      './src/settings.cc',
       './src/settings_pack.cc'
     ]
   }]

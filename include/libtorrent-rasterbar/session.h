@@ -23,6 +23,7 @@ class Session : public Nan::ObjectWrap {
   };
 
   static NAN_METHOD(New);
+
 #ifndef TORRENT_DISABLE_EXTENSIONS
   static NAN_METHOD(AddExtension);
 #endif // TORRENT_DISABLE_EXTENSIONS

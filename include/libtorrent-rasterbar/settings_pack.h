@@ -16,6 +16,10 @@ class SettingsPack : public Nan::ObjectWrap {
   libtorrent::settings_pack pack;
 
   static NAN_METHOD(New);
+
+  static NAN_METHOD(SettingByName);
+  static NAN_METHOD(NameForSetting);
+
   static NAN_METHOD(Set);
   static NAN_METHOD(Has);
   static NAN_METHOD(Clear);

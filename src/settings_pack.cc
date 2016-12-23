@@ -13,6 +13,10 @@ v8::Local<v8::Function> SettingsPack::Init() {
   tpl->SetClassName(Nan::New("SettingsPack").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
+  tpl->Set(Nan::New("numStringSettings").ToLocalChecked(), Nan::New(libtorrent::settings_pack::num_string_settings));
+  tpl->Set(Nan::New("numBoolSettings").ToLocalChecked(), Nan::New(libtorrent::settings_pack::num_bool_settings));
+  tpl->Set(Nan::New("numIntSettings").ToLocalChecked(), Nan::New(libtorrent::settings_pack::num_int_settings));
+
   Nan::SetPrototypeMethod(tpl, "set", Set);
   Nan::SetPrototypeMethod(tpl, "has", Has);
   Nan::SetPrototypeMethod(tpl, "clear", Clear);
