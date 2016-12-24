@@ -25,7 +25,7 @@ v8::Local<v8::Function> TorrentInfo::Init() {
 NAN_METHOD(TorrentInfo::New) {
   if (!info.IsConstructCall()) return;
 
-  libtorrent::torrent_info* ti;
+  libtorrent::torrent_info* ti = nullptr;
   boost::system::error_code ec;
   if (ARGUMENTS_IS_STRING(0)) {
     std::string filename(*Nan::Utf8String(info[0]));

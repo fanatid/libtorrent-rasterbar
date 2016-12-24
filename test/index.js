@@ -1,4 +1,5 @@
 'use strict'
+const spawnSync = require('child_process').spawnSync
 const DEFAULT_FILENAMES = [
   'session',
   'settings',
@@ -7,4 +8,6 @@ const DEFAULT_FILENAMES = [
 ]
 
 const filenames = process.env.FILENAMES && process.env.FILENAMES.split(',') || DEFAULT_FILENAMES
-for (let filename of filenames) require(`./${filename}`)
+for (let filename of filenames) {
+  spawnSync('tape', [`${filename}.js`], { stdio: 'inherit' })
+}
