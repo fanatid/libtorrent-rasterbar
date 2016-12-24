@@ -8,9 +8,9 @@
     ],
   },
   'targets': [{
-    'target_name': 'session_add_extension_plugin',
+    'target_name': 'session_add_extension',
     'sources': [
-      './session_add_extension_plugin.cc'
+      './session_add_extension.cc'
     ]
   }]
 }

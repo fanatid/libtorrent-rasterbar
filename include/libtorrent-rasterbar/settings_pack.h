@@ -12,9 +12,9 @@ class SettingsPack : public Nan::ObjectWrap {
   static Nan::Persistent<v8::FunctionTemplate> prototype;
   static Nan::Persistent<v8::Function> constructor;
 
- private:
   libtorrent::settings_pack pack;
 
+ private:
   static NAN_METHOD(New);
 
   static NAN_METHOD(SettingByName);

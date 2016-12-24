@@ -4,6 +4,7 @@
 #include <libtorrent-rasterbar/alert.h>
 #include <libtorrent-rasterbar/extensions.h>
 #include <libtorrent-rasterbar/session.h>
+#include <libtorrent-rasterbar/settings_pack.h>
 #include <libtorrent-rasterbar/macros.h>
 
 #include <boost/bind.hpp>
@@ -27,17 +28,33 @@ v8::Local<v8::Function> Session::Init() {
   Nan::SetPrototypeMethod(tpl, "popAlerts", PopAlerts);
   Nan::SetPrototypeMethod(tpl, "setAlertNotify", SetAlertNotify);
 
-  Session::prototype.Reset(tpl);
-  Session::constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  v8::Local<v8::Function> cons = Nan::GetFunction(tpl).ToLocalChecked();
+  v8::Local<v8::Object> flags = Nan::New<v8::Object>();
+  SET_INTEGER(flags, "addDefaultPlugins", libtorrent::session::add_default_plugins);
+  SET_INTEGER(flags, "startDefaultfeatures", libtorrent::session::start_default_features);
+  SET_VALUE(cons, "flags", Nan::New<v8::Value>(flags));
 
-  return scope.Escape(Nan::GetFunction(tpl).ToLocalChecked());
+  Session::prototype.Reset(tpl);
+  Session::constructor.Reset(cons);
+
+  return scope.Escape(cons);
 }
 
 NAN_METHOD(Session::New) {
   if (!info.IsConstructCall()) return;
 
   libtorrent::session* session;
-  session = new libtorrent::session();
+  if (info.Length() > 0) {
+    REQUIRE_ARGUMENT_INSTANCE(0, SettingsPack, obj_pack);
+    if (info.Length() > 1) {
+      REQUIRE_ARGUMENT_NUMBER(1, flags);
+      session = new libtorrent::session(obj_pack->pack, flags);
+    } else {
+      session = new libtorrent::session(obj_pack->pack);
+    }
+  } else {
+    session = new libtorrent::session();
+  }
 
   Session* obj = new Session(session);
   obj->Wrap(info.This());
@@ -56,16 +73,13 @@ NAN_METHOD(Session::AddExtension) {
     return Nan::ThrowError(("Unknow plugin name: " + name).c_str());
   }
 
-  if (info[0]->IsObject()) {
-    v8::Local<v8::Object> arg1 = info[0]->ToObject();
-    if (Nan::New(Plugin::prototype)->HasInstance(arg1)) {
-      Plugin* ps = Nan::ObjectWrap::Unwrap<Plugin>(arg1);
-      obj->session->add_extension(ps->Value());
-      return;
-    }
+  if (info[0]->IsObject() && Nan::New(Plugin::prototype)->HasInstance(info[0])) {
+    Plugin* ps = Nan::ObjectWrap::Unwrap<Plugin>(info[0]->ToObject());
+    obj->session->add_extension(ps->Value());
+    return;
   }
 
-  Nan::ThrowTypeError("expected String or Plugin");
+  Nan::ThrowTypeError("Argument 0 must be String or Plugin");
 }
 #endif // TORRENT_DISABLE_EXTENSIONS
 

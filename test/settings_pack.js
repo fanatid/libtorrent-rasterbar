@@ -19,7 +19,7 @@ test('SettingsPack', (t) => {
   }]
 
   for (let fixture of fixtures) {
-    test(`has/set/has/get/clear/has (type: ${fixture.type}, name: ${fixture.name})`, (t) => {
+    t.test(`has/set/has/get/clear/has (type: ${fixture.type}, name: ${fixture.name})`, (t) => {
       const pack = new libtorrent.settings.SettingsPack()
       t.false(pack.has(fixture.name))
       pack.set(fixture.name, fixture.value)

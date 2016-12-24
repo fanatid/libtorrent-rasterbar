@@ -25,6 +25,12 @@
   }                                                                           \
   v8::Local<v8::Function> var = v8::Local<v8::Function>::Cast(info[i]);
 
+#define REQUIRE_ARGUMENT_INSTANCE(i, cls, var)                                \
+  if (info.Length() < (i) || !info[i]->IsObject() || !Nan::New(cls::prototype)->HasInstance(info[i])) { \
+    return Nan::ThrowTypeError("Argument " #i " must be a " #cls);            \
+  }                                                                           \
+  cls* var = Nan::ObjectWrap::Unwrap<cls>(info[i]->ToObject());
+
 #define SET_VALUE(target, key, value)                                         \
   Nan::Set(target, Nan::New(key).ToLocalChecked(), value);
 

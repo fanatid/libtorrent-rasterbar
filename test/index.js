@@ -1,6 +1,7 @@
 'use strict'
 const DEFAULT_FILENAMES = [
-  'session_add_extension_plugin',
+  'session',
+  'session_add_extension',
   'session_pop_alerts',
   'settings',
   'settings_pack'

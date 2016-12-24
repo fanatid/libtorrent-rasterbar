@@ -13,19 +13,20 @@ v8::Local<v8::Function> SettingsPack::Init() {
   tpl->SetClassName(Nan::New("SettingsPack").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-  tpl->Set(Nan::New("numStringSettings").ToLocalChecked(), Nan::New(libtorrent::settings_pack::num_string_settings));
-  tpl->Set(Nan::New("numBoolSettings").ToLocalChecked(), Nan::New(libtorrent::settings_pack::num_bool_settings));
-  tpl->Set(Nan::New("numIntSettings").ToLocalChecked(), Nan::New(libtorrent::settings_pack::num_int_settings));
-
   Nan::SetPrototypeMethod(tpl, "set", Set);
   Nan::SetPrototypeMethod(tpl, "has", Has);
   Nan::SetPrototypeMethod(tpl, "clear", Clear);
   Nan::SetPrototypeMethod(tpl, "get", Get);
 
-  SettingsPack::prototype.Reset(tpl);
-  SettingsPack::constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  v8::Local<v8::Function> cons = Nan::GetFunction(tpl).ToLocalChecked();
+  SET_INTEGER(cons, "numStringSettings", libtorrent::settings_pack::num_string_settings);
+  SET_INTEGER(cons, "numBooleanSettings", libtorrent::settings_pack::num_bool_settings);
+  SET_INTEGER(cons, "numNumberSettings", libtorrent::settings_pack::num_int_settings);
 
-  return scope.Escape(Nan::GetFunction(tpl).ToLocalChecked());
+  SettingsPack::prototype.Reset(tpl);
+  SettingsPack::constructor.Reset(cons);
+
+  return scope.Escape(cons);
 }
 
 NAN_METHOD(SettingsPack::New) {
