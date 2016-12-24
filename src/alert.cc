@@ -13,10 +13,11 @@ v8::Local<v8::Function> Alert::Init() {
   tpl->SetClassName(Nan::New("Alert").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
+  v8::Local<v8::Function> cons = Nan::GetFunction(tpl).ToLocalChecked();
   Alert::prototype.Reset(tpl);
-  Alert::constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  Alert::constructor.Reset(cons);
 
-  return scope.Escape(Nan::GetFunction(tpl).ToLocalChecked());
+  return scope.Escape(cons);
 }
 
 v8::Local<v8::Object> Alert::FromAlertPointer(libtorrent::alert* alert) {

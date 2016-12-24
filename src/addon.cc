@@ -5,6 +5,7 @@
 #include <libtorrent-rasterbar/session.h>
 #include <libtorrent-rasterbar/settings.h>
 #include <libtorrent-rasterbar/settings_pack.h>
+#include <libtorrent-rasterbar/torrent_info.h>
 #include <libtorrent-rasterbar/macros.h>
 
 namespace libtorrent_rasterbar {
@@ -26,12 +27,24 @@ NAN_MODULE_INIT(InitExtensions) {
 #endif // TORRENT_DISABLE_EXTENSIONS
 }
 
+NAN_MODULE_INIT(InitSession) {
+  v8::Local<v8::Object> session = Nan::New<v8::Object>();
+  SET_VALUE(session, "Session", Session::Init());
+  SET_VALUE(target, "session", session);
+}
+
 NAN_MODULE_INIT(InitSettings) {
   v8::Local<v8::Object> settings = Nan::New<v8::Object>();
   SET_VALUE(settings, "SettingsPack", SettingsPack::Init());
   SET_FUNCTION(settings, "settingByName", SettingByName);
   SET_FUNCTION(settings, "nameForSetting", NameForSetting);
   SET_VALUE(target, "settings", settings);
+}
+
+NAN_MODULE_INIT(InitTorrent) {
+  v8::Local<v8::Object> torrent = Nan::New<v8::Object>();
+  SET_VALUE(torrent, "TorrentInfo", TorrentInfo::Init());
+  SET_VALUE(target, "torrent", torrent);
 }
 
 NAN_MODULE_INIT(InitFeatures) {
@@ -57,8 +70,9 @@ NAN_MODULE_INIT(Init) {
 
   InitAlerts(target);
   InitExtensions(target);
-  SET_VALUE(target, "Session", Session::Init());
+  InitSession(target);
   InitSettings(target);
+  InitTorrent(target);
 
   SET_STRING(target, "version", LIBTORRENT_VERSION);
   InitFeatures(target);

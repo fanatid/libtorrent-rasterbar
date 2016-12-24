@@ -14,10 +14,11 @@ v8::Local<v8::Function> Plugin::Init() {
   tpl->SetClassName(Nan::New("Plugin").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
+  v8::Local<v8::Function> cons = Nan::GetFunction(tpl).ToLocalChecked();
   Plugin::prototype.Reset(tpl);
-  Plugin::constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  Plugin::constructor.Reset(cons);
 
-  return scope.Escape(Nan::GetFunction(tpl).ToLocalChecked());
+  return scope.Escape(cons);
 }
 
 NAN_METHOD(Plugin::New) {

@@ -18,7 +18,8 @@
       './src/extensions.cc',
       './src/session.cc',
       './src/settings.cc',
-      './src/settings_pack.cc'
+      './src/settings_pack.cc',
+      './src/torrent_info.cc'
     ]
   }]
 }

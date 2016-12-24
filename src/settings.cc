@@ -4,12 +4,12 @@
 namespace libtorrent_rasterbar {
 
 NAN_METHOD(SettingByName) {
-  REQUIRE_ARGUMENT_STRING(0, name);
+  ARGUMENTS_REQUIRE_STRING(0, name);
   info.GetReturnValue().Set(Nan::New(libtorrent::setting_by_name(std::string(*name))));
 }
 
 NAN_METHOD(NameForSetting) {
-  REQUIRE_ARGUMENT_NUMBER(0, s);
+  ARGUMENTS_REQUIRE_NUMBER(0, s);
   info.GetReturnValue().Set(Nan::New(libtorrent::name_for_setting(s)).ToLocalChecked());
 }
 

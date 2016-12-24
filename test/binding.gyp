@@ -8,9 +8,11 @@
     ],
   },
   'targets': [{
-    'target_name': 'session_add_extension',
+    'type': 'loadable_module',
+    'target_name': 'addon_test',
+    'product_name': 'addon_test',
     'sources': [
-      './session_add_extension.cc'
+      './addon_test.cc'
     ]
   }]
 }

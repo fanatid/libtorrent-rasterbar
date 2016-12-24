@@ -32,7 +32,7 @@
     "install": "node-gyp rebuild",
     "lint": "standard",
     "test": "npm run lint && npm run unit",
-    "unit": "cd test && node-gyp configure && node-gyp build && tape index.js | tap-dot"
+    "unit": "cd test && node-gyp configure && node-gyp build && tape index.js"
   },
   "dependencies": {
     "bindings": "^1.2.1",
@@ -41,7 +41,6 @@
   "devDependencies": {
     "node-gyp": "^3.3.1",
     "standard": "*",
-    "tap-dot": "^1.0.5",
     "tape": "^4.6.3"
   },
   "engines": {

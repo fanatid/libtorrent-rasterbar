@@ -38,22 +38,22 @@ NAN_METHOD(SettingsPack::New) {
 }
 
 NAN_METHOD(SettingsPack::Set) {
-  REQUIRE_ARGUMENT_NUMBER(0, name);
+  ARGUMENTS_REQUIRE_NUMBER(0, name);
   SettingsPack* obj = Nan::ObjectWrap::Unwrap<SettingsPack>(info.Holder());
 
   switch (name & libtorrent::settings_pack::type_mask) {
     case libtorrent::settings_pack::string_type_base: {
-      REQUIRE_ARGUMENT_STRING(1, val);
+      ARGUMENTS_REQUIRE_STRING(1, val);
       return obj->pack.set_str(name, std::string(*val));
     }
 
     case libtorrent::settings_pack::int_type_base: {
-      REQUIRE_ARGUMENT_NUMBER(1, val);
+      ARGUMENTS_REQUIRE_NUMBER(1, val);
       return obj->pack.set_int(name, val);
     }
 
     case libtorrent::settings_pack::bool_type_base: {
-      REQUIRE_ARGUMENT_BOOLEAN(1, val);
+      ARGUMENTS_REQUIRE_BOOLEAN(1, val);
       return obj->pack.set_bool(name, val);
     }
 
@@ -64,7 +64,7 @@ NAN_METHOD(SettingsPack::Set) {
 }
 
 NAN_METHOD(SettingsPack::Has) {
-  REQUIRE_ARGUMENT_NUMBER(0, name);
+  ARGUMENTS_REQUIRE_NUMBER(0, name);
   SettingsPack* obj = Nan::ObjectWrap::Unwrap<SettingsPack>(info.Holder());
   info.GetReturnValue().Set(Nan::New(obj->pack.has_val(name)));
 }
@@ -75,7 +75,7 @@ NAN_METHOD(SettingsPack::Clear) {
 }
 
 NAN_METHOD(SettingsPack::Get) {
-  REQUIRE_ARGUMENT_NUMBER(0, name);
+  ARGUMENTS_REQUIRE_NUMBER(0, name);
   SettingsPack* obj = Nan::ObjectWrap::Unwrap<SettingsPack>(info.Holder());
 
   switch (name & libtorrent::settings_pack::type_mask) {

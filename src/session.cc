@@ -45,9 +45,9 @@ NAN_METHOD(Session::New) {
 
   libtorrent::session* session;
   if (info.Length() > 0) {
-    REQUIRE_ARGUMENT_INSTANCE(0, SettingsPack, obj_pack);
+    ARGUMENTS_REQUIRE_INSTANCE(0, SettingsPack, obj_pack);
     if (info.Length() > 1) {
-      REQUIRE_ARGUMENT_NUMBER(1, flags);
+      ARGUMENTS_REQUIRE_NUMBER(1, flags);
       session = new libtorrent::session(obj_pack->pack, flags);
     } else {
       session = new libtorrent::session(obj_pack->pack);
@@ -67,13 +67,19 @@ NAN_METHOD(Session::AddExtension) {
 
   if (info[0]->IsString()) {
     std::string name(*Nan::Utf8String(info[0]));
-    if (name == "smart_ban") obj->session->add_extension(libtorrent::create_smart_ban_plugin);
-    if (name == "ut_metadata") obj->session->add_extension(libtorrent::create_ut_metadata_plugin);
-    if (name == "ut_pex") obj->session->add_extension(libtorrent::create_ut_pex_plugin);
-    return Nan::ThrowError(("Unknow plugin name: " + name).c_str());
+    if (name == "smart_ban") {
+      obj->session->add_extension(libtorrent::create_smart_ban_plugin);
+    } else if (name == "ut_metadata") {
+      obj->session->add_extension(libtorrent::create_ut_metadata_plugin);
+    } else if (name == "ut_pex") {
+      obj->session->add_extension(libtorrent::create_ut_pex_plugin);
+    } else {
+      Nan::ThrowError(("Unknow plugin name: " + name).c_str());
+    }
+    return;
   }
 
-  if (info[0]->IsObject() && Nan::New(Plugin::prototype)->HasInstance(info[0])) {
+  if (ARGUMENTS_IS_INSTANCE(0, Plugin)) {
     Plugin* ps = Nan::ObjectWrap::Unwrap<Plugin>(info[0]->ToObject());
     obj->session->add_extension(ps->Value());
     return;
@@ -84,7 +90,7 @@ NAN_METHOD(Session::AddExtension) {
 #endif // TORRENT_DISABLE_EXTENSIONS
 
 NAN_METHOD(Session::PopAlerts) {
-  REQUIRE_ARGUMENT_NUMBER(0, count);
+  ARGUMENTS_REQUIRE_NUMBER(0, count);
   if (count == 0) return Nan::ThrowRangeError("Argument 0 must be more than zero");
 
   Session* obj = Nan::ObjectWrap::Unwrap<Session>(info.Holder());
@@ -108,7 +114,7 @@ void AlertNotify(Session* obj) {
 }
 
 NAN_METHOD(Session::SetAlertNotify) {
-  REQUIRE_ARGUMENT_FUNCTION(0, callback);
+  ARGUMENTS_REQUIRE_FUNCTION(0, callback);
 
   Session* obj = Nan::ObjectWrap::Unwrap<Session>(info.Holder());
   if (obj->fnAlertNotify.IsEmpty()) obj->session->set_alert_notify(boost::bind(AlertNotify, obj));

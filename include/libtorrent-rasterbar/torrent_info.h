@@ -1,0 +1,28 @@
+#ifndef LIBTORRENT_RASTERBAR_TORRENT_INFO_H_
+#define LIBTORRENT_RASTERBAR_TORRENT_INFO_H_
+
+#include <nan.h>
+#include <libtorrent/torrent_info.hpp>
+
+namespace libtorrent_rasterbar {
+
+class TorrentInfo : public Nan::ObjectWrap {
+ public:
+  static Nan::Persistent<v8::FunctionTemplate> prototype;
+  static Nan::Persistent<v8::Function> constructor;
+  static v8::Local<v8::Function> Init();
+
+  libtorrent::torrent_info* ti;
+
+ private:
+  explicit TorrentInfo(libtorrent::torrent_info* ti) : ti(ti) {};
+  ~TorrentInfo() {
+    delete ti;
+  };
+
+  static NAN_METHOD(New);
+};
+
+} // namespace libtorrent_rasterbar
+
+#endif // LIBTORRENT_RASTERBAR_TORRENT_INFO_H_
