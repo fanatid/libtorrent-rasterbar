@@ -8,9 +8,9 @@ namespace libtorrent_rasterbar {
 
 class SettingsPack : public Nan::ObjectWrap {
  public:
-  static v8::Local<v8::Function> Init();
   static Nan::Persistent<v8::FunctionTemplate> prototype;
   static Nan::Persistent<v8::Function> constructor;
+  static v8::Local<v8::Function> Init();
 
   libtorrent::settings_pack pack;
 

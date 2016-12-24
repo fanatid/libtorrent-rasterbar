@@ -8,15 +8,14 @@ namespace libtorrent_rasterbar {
 
 class Session : public Nan::ObjectWrap {
  public:
-  static v8::Local<v8::Function> Init();
   static Nan::Persistent<v8::FunctionTemplate> prototype;
   static Nan::Persistent<v8::Function> constructor;
+  static v8::Local<v8::Function> Init();
 
+  libtorrent::session* session;
   Nan::Persistent<v8::Function> fnAlertNotify;
 
  private:
-  libtorrent::session* session;
-
   explicit Session(libtorrent::session* session) : session(session) {};
   ~Session() {
     delete session;

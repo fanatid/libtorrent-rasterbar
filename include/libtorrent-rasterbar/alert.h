@@ -8,15 +8,14 @@ namespace libtorrent_rasterbar {
 
 class Alert : public Nan::ObjectWrap {
  public:
-  static v8::Local<v8::Function> Init();
   static Nan::Persistent<v8::FunctionTemplate> prototype;
   static Nan::Persistent<v8::Function> constructor;
-
+  static v8::Local<v8::Function> Init();
   static v8::Local<v8::Object> FromAlertPointer(libtorrent::alert*);
 
- private:
   libtorrent::alert* alert;
 
+ private:
   static NAN_METHOD(New);
 };
 

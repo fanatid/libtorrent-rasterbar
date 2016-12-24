@@ -10,16 +10,16 @@ namespace libtorrent_rasterbar {
 
 class Plugin : public Nan::ObjectWrap {
  public:
-  static v8::Local<v8::Function> Init();
   static Nan::Persistent<v8::FunctionTemplate> prototype;
   static Nan::Persistent<v8::Function> constructor;
+  static v8::Local<v8::Function> Init();
+
+  boost::shared_ptr<libtorrent::plugin> ext;
 
   void Reset (boost::shared_ptr<libtorrent::plugin> _ext) { ext = _ext; }
   boost::shared_ptr<libtorrent::plugin> Value () { return ext; }
 
  private:
-  boost::shared_ptr<libtorrent::plugin> ext;
-
   static NAN_METHOD(New);
 };
 

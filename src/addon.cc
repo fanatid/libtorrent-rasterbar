@@ -53,6 +53,8 @@ NAN_MODULE_INIT(InitFeatures) {
 }
 
 NAN_MODULE_INIT(Init) {
+  Nan::HandleScope scope; // HandleScope for initialization
+
   InitAlerts(target);
   InitExtensions(target);
   SET_VALUE(target, "Session", Session::Init());
