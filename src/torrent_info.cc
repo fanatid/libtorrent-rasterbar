@@ -13,8 +13,6 @@ v8::Local<v8::Function> TorrentInfo::Init() {
   tpl->SetClassName(Nan::New("TorrentInfo").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-  // Nan::SetPrototypeMethod(tpl, "addExtension", AddExtension);
-
   v8::Local<v8::Function> cons = Nan::GetFunction(tpl).ToLocalChecked();
   TorrentInfo::prototype.Reset(tpl);
   TorrentInfo::constructor.Reset(cons);
@@ -25,21 +23,20 @@ v8::Local<v8::Function> TorrentInfo::Init() {
 NAN_METHOD(TorrentInfo::New) {
   if (!info.IsConstructCall()) return;
 
-  libtorrent::torrent_info* ti = nullptr;
+  boost::shared_ptr<libtorrent::torrent_info> ti;
   boost::system::error_code ec;
   if (ARGUMENTS_IS_STRING(0)) {
     std::string filename(*Nan::Utf8String(info[0]));
-    ti = new libtorrent::torrent_info(filename, ec);
-  } else if (ARGUMENTS_IS_BUFFER(0) && ARGUMENTS_IS_NUMBER(1)) {
+    ti = boost::shared_ptr<libtorrent::torrent_info>(new libtorrent::torrent_info(filename, ec));
+  } else if (ARGUMENTS_IS_BUFFER(0)) {
     const char* buffer = node::Buffer::Data(info[0]);
-    int size = info[1]->IntegerValue();
-    ti = new libtorrent::torrent_info(buffer, size, ec);
+    int size = node::Buffer::Length(info[0]);
+    ti = boost::shared_ptr<libtorrent::torrent_info>(new libtorrent::torrent_info(buffer, size, ec));
   } else {
-    return Nan::ThrowTypeError("Arguments must be (String) or (Buffer, Number)");
+    return Nan::ThrowTypeError("Arguments must be String or Buffer");
   }
 
   if (ec != boost::system::errc::success) {
-    delete ti;
     return Nan::ThrowError(ec.message().c_str());
   }
 

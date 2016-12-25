@@ -12,13 +12,10 @@ class TorrentInfo : public Nan::ObjectWrap {
   static Nan::Persistent<v8::Function> constructor;
   static v8::Local<v8::Function> Init();
 
-  libtorrent::torrent_info* ti;
+  boost::shared_ptr<libtorrent::torrent_info> ti;
 
  private:
-  explicit TorrentInfo(libtorrent::torrent_info* ti) : ti(ti) {};
-  ~TorrentInfo() {
-    delete ti;
-  };
+  explicit TorrentInfo(boost::shared_ptr<libtorrent::torrent_info> ti) : ti(ti) {};
 
   static NAN_METHOD(New);
 };

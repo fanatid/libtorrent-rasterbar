@@ -1,8 +1,19 @@
 #ifndef LIBTORRENT_RASTERBAR_MACROS_H_
 #define LIBTORRENT_RASTERBAR_MACROS_H_
 
+#define ARGUMENTS_OPTIONAL_OBJECT(i, var, defaultValue)                       \
+  v8::Local<v8::Object> var;                                                  \
+  if (info.Length() > i && !info[i]->IsUndefined()) {                         \
+    if (!info[i]->IsObject()) {                                               \
+      return Nan::ThrowTypeError("Argument " #i " must be a Object");         \
+    }                                                                         \
+    var = info[i]->ToObject();                                                \
+  } else {                                                                    \
+    var = (defaultValue);                                                     \
+  }
+
 #define ARGUMENTS_IS_NUMBER(i)                                                \
-  (info.Length() >= (i) && info[i]->IsNumber())
+  (info.Length() > (i) && info[i]->IsNumber())
 
 #define ARGUMENTS_REQUIRE_NUMBER(i, var)                                      \
   if (!ARGUMENTS_IS_NUMBER(i)) {                                              \
@@ -10,14 +21,17 @@
   }                                                                           \
   int64_t var = info[i]->IntegerValue();
 
+#define ARGUMENTS_IS_BOOLEAN(i)                                               \
+  (info.Length() > (i) && info[i]->IsBoolean())
+
 #define ARGUMENTS_REQUIRE_BOOLEAN(i, var)                                     \
-  if (info.Length() <= (i) || !info[i]->IsBoolean()) {                        \
+  if (!ARGUMENTS_IS_BOOLEAN(i)) {                                             \
     return Nan::ThrowTypeError("Argument " #i " must be a Boolean");          \
   }                                                                           \
   bool var = info[i]->BooleanValue();
 
 #define ARGUMENTS_IS_STRING(i)                                                \
-  (info.Length() >= (i) && info[i]->IsString())
+  (info.Length() > (i) && info[i]->IsString())
 
 #define ARGUMENTS_REQUIRE_STRING(i, var)                                      \
   if (!ARGUMENTS_IS_STRING(i)) {                                              \
@@ -25,8 +39,11 @@
   }                                                                           \
   Nan::Utf8String var(info[i]);
 
+#define ARGUMENTS_IS_FUNCTION(i)                                              \
+  (info.Length() > (i) && info[i]->IsFunction())
+
 #define ARGUMENTS_REQUIRE_FUNCTION(i, var)                                    \
-  if (info.Length() <= (i) || !info[i]->IsFunction()) {                       \
+  if (!ARGUMENTS_IS_FUNCTION(i)) {                                            \
     return Nan::ThrowTypeError("Argument " #i " must be a Function");         \
   }                                                                           \
   v8::Local<v8::Function> var = v8::Local<v8::Function>::Cast(info[i]);

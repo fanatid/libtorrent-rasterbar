@@ -1,3 +1,4 @@
+#include <libtorrent/settings_pack.hpp>
 #include <libtorrent-rasterbar/settings_pack.h>
 #include <libtorrent-rasterbar/macros.h>
 

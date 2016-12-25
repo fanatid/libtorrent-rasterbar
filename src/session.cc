@@ -1,10 +1,12 @@
 #include <libtorrent/extensions/smart_ban.hpp>
 #include <libtorrent/extensions/ut_metadata.hpp>
 #include <libtorrent/extensions/ut_pex.hpp>
+#include <libtorrent-rasterbar/add_torrent_params.h>
 #include <libtorrent-rasterbar/alert.h>
 #include <libtorrent-rasterbar/extensions.h>
 #include <libtorrent-rasterbar/session.h>
 #include <libtorrent-rasterbar/settings_pack.h>
+#include <libtorrent-rasterbar/torrent_handle.h>
 #include <libtorrent-rasterbar/macros.h>
 
 #include <boost/bind.hpp>
@@ -22,6 +24,8 @@ v8::Local<v8::Function> Session::Init() {
   tpl->SetClassName(Nan::New("Session").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
+  Nan::SetPrototypeMethod(tpl, "addTorrent", AddTorrent);
+  Nan::SetPrototypeMethod(tpl, "asyncAddTorrent", AsyncAddTorrent);
 #ifndef TORRENT_DISABLE_EXTENSIONS
   Nan::SetPrototypeMethod(tpl, "addExtension", AddExtension);
 #endif // TORRENT_DISABLE_EXTENSIONS
@@ -29,10 +33,8 @@ v8::Local<v8::Function> Session::Init() {
   Nan::SetPrototypeMethod(tpl, "setAlertNotify", SetAlertNotify);
 
   v8::Local<v8::Function> cons = Nan::GetFunction(tpl).ToLocalChecked();
-  v8::Local<v8::Object> flags = Nan::New<v8::Object>();
-  SET_INTEGER(flags, "addDefaultPlugins", libtorrent::session::add_default_plugins);
-  SET_INTEGER(flags, "startDefaultfeatures", libtorrent::session::start_default_features);
-  SET_VALUE(cons, "flags", Nan::New<v8::Value>(flags));
+  SET_INTEGER(cons, "ADD_DEFAULT_PLUGINS", libtorrent::session::add_default_plugins);
+  SET_INTEGER(cons, "START_DEFAULT_FEATURES", libtorrent::session::start_default_features);
 
   Session::prototype.Reset(tpl);
   Session::constructor.Reset(cons);
@@ -43,22 +45,48 @@ v8::Local<v8::Function> Session::Init() {
 NAN_METHOD(Session::New) {
   if (!info.IsConstructCall()) return;
 
-  libtorrent::session* session;
+  boost::shared_ptr<libtorrent::session> session;
   if (info.Length() > 0) {
     ARGUMENTS_REQUIRE_INSTANCE(0, SettingsPack, obj_pack);
     if (info.Length() > 1) {
       ARGUMENTS_REQUIRE_NUMBER(1, flags);
-      session = new libtorrent::session(obj_pack->pack, flags);
+      session = boost::shared_ptr<libtorrent::session>(new libtorrent::session(obj_pack->pack, flags));
     } else {
-      session = new libtorrent::session(obj_pack->pack);
+      session = boost::shared_ptr<libtorrent::session>(new libtorrent::session(obj_pack->pack));
     }
   } else {
-    session = new libtorrent::session();
+    session = boost::shared_ptr<libtorrent::session>(new libtorrent::session());
   }
 
   Session* obj = new Session(session);
   obj->Wrap(info.This());
   info.GetReturnValue().Set(info.This());
+}
+
+NAN_METHOD(Session::AddTorrent) {
+  Session* obj = Nan::ObjectWrap::Unwrap<Session>(info.Holder());
+
+  ARGUMENTS_OPTIONAL_OBJECT(0, arg0, Nan::New<v8::Object>());
+  libtorrent::add_torrent_params p;
+  if (AddTorrentParamsFromObject(arg0, p) != 0) return;
+
+  boost::system::error_code ec;
+  libtorrent::torrent_handle th = obj->session->add_torrent(p, ec);
+  if (ec != boost::system::errc::success) {
+    return Nan::ThrowError(ec.message().c_str());
+  }
+
+  info.GetReturnValue().Set(TorrentHandle::FromTorrentHandle(th));
+}
+
+NAN_METHOD(Session::AsyncAddTorrent) {
+  Session* obj = Nan::ObjectWrap::Unwrap<Session>(info.Holder());
+
+  ARGUMENTS_OPTIONAL_OBJECT(0, arg0, Nan::New<v8::Object>());
+  libtorrent::add_torrent_params p;
+  if (AddTorrentParamsFromObject(arg0, p) != 0) return;
+
+  obj->session->async_add_torrent(p);
 }
 
 #ifndef TORRENT_DISABLE_EXTENSIONS
@@ -95,6 +123,8 @@ NAN_METHOD(Session::PopAlerts) {
 
   Session* obj = Nan::ObjectWrap::Unwrap<Session>(info.Holder());
   std::vector<libtorrent::alert*> alerts(count);
+  // TODO: mark previous created Alert as not valid
+  // At least we should remove pointers!
   obj->session->pop_alerts(&alerts);
 
   v8::Local<v8::Array> result = Nan::New<v8::Array>();

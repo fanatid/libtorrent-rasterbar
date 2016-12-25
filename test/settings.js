@@ -14,9 +14,9 @@ test('settings', (t) => {
     }
 
     const settings = Object.assign(
-      extract(0x0000, libtorrent.settings.SettingsPack.numStringSettings),
-      extract(0x4000, libtorrent.settings.SettingsPack.numNumberSettings),
-      extract(0x8000, libtorrent.settings.SettingsPack.numBooleanSettings))
+      extract(0x0000, libtorrent.settings.NUM_STRING_SETTINGS),
+      extract(0x4000, libtorrent.settings.NUM_NUMBER_SETTINGS),
+      extract(0x8000, libtorrent.settings.NUM_BOOLEAN_SETTINGS))
 
     const byName = Object.keys(settings).reduce((obj, name) => {
       return Object.assign(obj, { [name]: libtorrent.settings.settingByName(name) })

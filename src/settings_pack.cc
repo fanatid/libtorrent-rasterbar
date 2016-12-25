@@ -19,10 +19,6 @@ v8::Local<v8::Function> SettingsPack::Init() {
   Nan::SetPrototypeMethod(tpl, "get", Get);
 
   v8::Local<v8::Function> cons = Nan::GetFunction(tpl).ToLocalChecked();
-  SET_INTEGER(cons, "numStringSettings", libtorrent::settings_pack::num_string_settings);
-  SET_INTEGER(cons, "numBooleanSettings", libtorrent::settings_pack::num_bool_settings);
-  SET_INTEGER(cons, "numNumberSettings", libtorrent::settings_pack::num_int_settings);
-
   SettingsPack::prototype.Reset(tpl);
   SettingsPack::constructor.Reset(cons);
 

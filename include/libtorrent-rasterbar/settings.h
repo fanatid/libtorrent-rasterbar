@@ -2,7 +2,6 @@
 #define LIBTORRENT_RASTERBAR_SETTINGS_H_
 
 #include <nan.h>
-#include <libtorrent/settings_pack.hpp>
 
 namespace libtorrent_rasterbar {
 
