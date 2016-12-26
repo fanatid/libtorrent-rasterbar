@@ -13,6 +13,13 @@ v8::Local<v8::Function> Alert::Init() {
   tpl->SetClassName(Nan::New("Alert").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
+  v8::Local<v8::ObjectTemplate> inst = tpl->InstanceTemplate();
+  Nan::SetAccessor(inst, Nan::New("timestamp").ToLocalChecked(), Alert::GetTimestamp);
+  Nan::SetAccessor(inst, Nan::New("type").ToLocalChecked(), Alert::GetType);
+  Nan::SetAccessor(inst, Nan::New("what").ToLocalChecked(), Alert::GetWhat);
+  Nan::SetAccessor(inst, Nan::New("message").ToLocalChecked(), Alert::GetMessage);
+  Nan::SetAccessor(inst, Nan::New("category").ToLocalChecked(), Alert::GetCategory);
+
   v8::Local<v8::Function> cons = Nan::GetFunction(tpl).ToLocalChecked();
   Alert::prototype.Reset(tpl);
   Alert::constructor.Reset(cons);
@@ -54,10 +61,6 @@ v8::Local<v8::Object> Alert::FromAlertPointer(libtorrent::alert* alert) {
 
   v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
   v8::Local<v8::Object> result = Nan::NewInstance(cons).ToLocalChecked();
-  SET_INTEGER(result, "type", alert->type());
-  SET_STRING(result, "what", alert->what());
-  SET_STRING(result, "message", alert->message().c_str());
-  SET_INTEGER(result, "category", alert->category());
 
   Alert* obj = Nan::ObjectWrap::Unwrap<Alert>(result);
   obj->alert = alert;
@@ -71,6 +74,32 @@ NAN_METHOD(Alert::New) {
   Alert* obj = new Alert();
   obj->Wrap(info.This());
   info.GetReturnValue().Set(info.This());
+}
+
+NAN_GETTER(Alert::GetTimestamp) {
+  Alert* obj = Nan::ObjectWrap::Unwrap<Alert>(info.Holder());
+  auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(obj->alert->timestamp().time_since_epoch()).count();
+  info.GetReturnValue().Set(Nan::New<v8::Date>(ns / 1000000).ToLocalChecked());
+}
+
+NAN_GETTER(Alert::GetType) {
+  Alert* obj = Nan::ObjectWrap::Unwrap<Alert>(info.Holder());
+  info.GetReturnValue().Set(Nan::New(obj->alert->type()));
+}
+
+NAN_GETTER(Alert::GetWhat) {
+  Alert* obj = Nan::ObjectWrap::Unwrap<Alert>(info.Holder());
+  info.GetReturnValue().Set(Nan::New(obj->alert->what()).ToLocalChecked());
+}
+
+NAN_GETTER(Alert::GetMessage) {
+  Alert* obj = Nan::ObjectWrap::Unwrap<Alert>(info.Holder());
+  info.GetReturnValue().Set(Nan::New(obj->alert->message().c_str()).ToLocalChecked());
+}
+
+NAN_GETTER(Alert::GetCategory) {
+  Alert* obj = Nan::ObjectWrap::Unwrap<Alert>(info.Holder());
+  info.GetReturnValue().Set(Nan::New(obj->alert->category()));
 }
 
 } // namespace libtorrent_rasterbar
