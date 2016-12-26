@@ -3,7 +3,7 @@ const test = require('tape')
 
 test('Session', (t) => {
   const libtorrent = require('../')
-  const Session = libtorrent.session.Session
+  const Session = libtorrent.Session
 
   t.test('constructor', (t) => {
     t.test('without arguments', (t) => {
@@ -21,7 +21,7 @@ test('Session', (t) => {
 
     t.test('pass SettingsPack and flags', (t) => {
       const pack = new libtorrent.settings.SettingsPack()
-      const flags = Session.ADD_DEFAULT_PLUGINS | Session.START_DEFAULT_FEATURES
+      const flags = Session.flags.ADD_DEFAULT_PLUGINS | Session.flags.START_DEFAULT_FEATURES
       t.true(new Session(pack, flags) instanceof Session)
 
       t.end()

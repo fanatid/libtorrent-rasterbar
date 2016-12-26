@@ -11,6 +11,7 @@ class Alert : public Nan::ObjectWrap {
   static Nan::Persistent<v8::FunctionTemplate> prototype;
   static Nan::Persistent<v8::Function> constructor;
   static v8::Local<v8::Function> Init();
+  static v8::Local<v8::Object> GetCategories();
   static v8::Local<v8::Object> FromAlertPointer(libtorrent::alert*);
 
   libtorrent::alert* alert;

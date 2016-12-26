@@ -20,7 +20,7 @@
 
 namespace libtorrent_rasterbar {
 
-v8::Local<v8::Object> AddTorrentParamsFlags() {
+v8::Local<v8::Object> GetAddTorrentParamsFlags() {
   Nan::EscapableHandleScope scope;
   v8::Local<v8::Object> flags = Nan::New<v8::Object>();
 

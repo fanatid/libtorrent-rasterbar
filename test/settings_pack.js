@@ -6,15 +6,15 @@ test('SettingsPack', (t) => {
 
   const fixtures = [{
     type: 'string',
-    name: 0x0000,
+    name: libtorrent.settings.STRING.offset,
     value: 'Hello world!'
   }, {
     type: 'int',
-    name: 0x4000,
+    name: libtorrent.settings.NUMBER.offset,
     value: 42
   }, {
     type: 'bool',
-    name: 0x8000,
+    name: libtorrent.settings.BOOLEAN.offset,
     value: true
   }]
 

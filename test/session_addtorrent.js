@@ -3,7 +3,7 @@ const test = require('tape')
 
 test('Session#addTorrent', (t) => {
   const libtorrent = require('../')
-  const Session = libtorrent.session.Session
+  const Session = libtorrent.Session
 
   t.test('without arguments', (t) => {
     const s = new Session()

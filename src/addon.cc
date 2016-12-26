@@ -15,6 +15,7 @@ namespace libtorrent_rasterbar {
 NAN_MODULE_INIT(InitAlerts) {
   v8::Local<v8::Object> alerts = Nan::New<v8::Object>();
   SET_VALUE(alerts, "Alert", Alert::Init());
+  SET_VALUE(alerts, "categories", Alert::GetCategories());
   SET_VALUE(target, "alerts", alerts);
 }
 
@@ -30,9 +31,7 @@ NAN_MODULE_INIT(InitExtensions) {
 }
 
 NAN_MODULE_INIT(InitSession) {
-  v8::Local<v8::Object> session = Nan::New<v8::Object>();
-  SET_VALUE(session, "Session", Session::Init());
-  SET_VALUE(target, "session", session);
+  SET_VALUE(target, "Session", Session::Init());
 }
 
 NAN_MODULE_INIT(InitSettings) {
@@ -40,22 +39,33 @@ NAN_MODULE_INIT(InitSettings) {
   SET_VALUE(settings, "SettingsPack", SettingsPack::Init());
   SET_FUNCTION(settings, "settingByName", SettingByName);
   SET_FUNCTION(settings, "nameForSetting", NameForSetting);
-  SET_INTEGER(settings, "NUM_STRING_SETTINGS", libtorrent::settings_pack::num_string_settings);
-  SET_INTEGER(settings, "NUM_BOOLEAN_SETTINGS", libtorrent::settings_pack::num_bool_settings);
-  SET_INTEGER(settings, "NUM_NUMBER_SETTINGS", libtorrent::settings_pack::num_int_settings);
+  v8::Local<v8::Object> strings = Nan::New<v8::Object>();
+  SET_INTEGER(strings, "offset", 0x0000);
+  SET_INTEGER(strings, "count", libtorrent::settings_pack::num_string_settings);
+  SET_VALUE(settings, "STRING", strings);
+  v8::Local<v8::Object> number = Nan::New<v8::Object>();
+  SET_INTEGER(number, "offset", 0x4000);
+  SET_INTEGER(number, "count", libtorrent::settings_pack::num_int_settings);
+  SET_VALUE(settings, "NUMBER", number);
+  v8::Local<v8::Object> boolean = Nan::New<v8::Object>();
+  SET_INTEGER(boolean, "offset", 0x8000);
+  SET_INTEGER(boolean, "count", libtorrent::settings_pack::num_bool_settings);
+  SET_VALUE(settings, "BOOLEAN", boolean);
   SET_VALUE(target, "settings", settings);
 }
 
 NAN_MODULE_INIT(InitStorage) {
   v8::Local<v8::Object> storage = Nan::New<v8::Object>();
-  SET_INTEGER(storage, "STORAGE_MODE_ALLOCATE", libtorrent::storage_mode_allocate);
-  SET_INTEGER(storage, "STORAGE_MODE_SPARSE", libtorrent::storage_mode_sparse);
+  v8::Local<v8::Object> modes = Nan::New<v8::Object>();
+  SET_INTEGER(modes, "ALLOCATE", libtorrent::storage_mode_allocate);
+  SET_INTEGER(modes, "SPARSE", libtorrent::storage_mode_sparse);
+  SET_VALUE(storage, "modes", modes);
   SET_VALUE(target, "storage", storage);
 }
 
 NAN_MODULE_INIT(InitTorrent) {
   v8::Local<v8::Object> torrent = Nan::New<v8::Object>();
-  SET_VALUE(torrent, "ADD_TORRENT_PARAMS", AddTorrentParamsFlags());
+  SET_VALUE(torrent, "ADD_TORRENT_PARAMS", GetAddTorrentParamsFlags());
   SET_VALUE(torrent, "TorrentInfo", TorrentInfo::Init());
   TorrentHandle::Init();
   SET_VALUE(target, "torrent", torrent);

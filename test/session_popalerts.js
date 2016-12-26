@@ -3,7 +3,7 @@ const test = require('tape')
 
 test('Session#popAlerts', (t) => {
   const libtorrent = require('../')
-  const Session = libtorrent.session.Session
+  const Session = libtorrent.Session
 
   t.test('pop 1 alert', (t) => {
     const s = new Session()

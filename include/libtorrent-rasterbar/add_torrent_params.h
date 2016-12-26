@@ -6,7 +6,7 @@
 
 namespace libtorrent_rasterbar {
 
-v8::Local<v8::Object> AddTorrentParamsFlags();
+v8::Local<v8::Object> GetAddTorrentParamsFlags();
 int AddTorrentParamsFromObject(v8::Local<v8::Object>, libtorrent::add_torrent_params&);
 
 } // namespace libtorrent_rasterbar

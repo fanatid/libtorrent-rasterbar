@@ -5,18 +5,18 @@ test('settings', (t) => {
   const libtorrent = require('../')
 
   t.test('nameForSetting/settingByName', (t) => {
-    function extract (start, count) {
+    function extract (data) {
       const settings = {}
-      for (let i = start; i !== start + count; ++i) {
+      for (let i = data.offset; i !== data.offset + data.count; ++i) {
         settings[libtorrent.settings.nameForSetting(i)] = i
       }
       return settings
     }
 
     const settings = Object.assign(
-      extract(0x0000, libtorrent.settings.NUM_STRING_SETTINGS),
-      extract(0x4000, libtorrent.settings.NUM_NUMBER_SETTINGS),
-      extract(0x8000, libtorrent.settings.NUM_BOOLEAN_SETTINGS))
+      extract(libtorrent.settings.STRING),
+      extract(libtorrent.settings.NUMBER),
+      extract(libtorrent.settings.BOOLEAN))
 
     const byName = Object.keys(settings).reduce((obj, name) => {
       return Object.assign(obj, { [name]: libtorrent.settings.settingByName(name) })

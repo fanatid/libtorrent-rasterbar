@@ -34,8 +34,10 @@ v8::Local<v8::Function> Session::Init() {
   Nan::SetPrototypeMethod(tpl, "setAlertNotify", SetAlertNotify);
 
   v8::Local<v8::Function> cons = Nan::GetFunction(tpl).ToLocalChecked();
-  SET_INTEGER(cons, "ADD_DEFAULT_PLUGINS", libtorrent::session::add_default_plugins);
-  SET_INTEGER(cons, "START_DEFAULT_FEATURES", libtorrent::session::start_default_features);
+  v8::Local<v8::Object> flags = Nan::New<v8::Object>();
+  SET_INTEGER(flags, "ADD_DEFAULT_PLUGINS", libtorrent::session::add_default_plugins);
+  SET_INTEGER(flags, "START_DEFAULT_FEATURES", libtorrent::session::start_default_features);
+  SET_VALUE(cons, "flags", flags);
 
   Session::prototype.Reset(tpl);
   Session::constructor.Reset(cons);

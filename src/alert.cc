@@ -20,6 +20,35 @@ v8::Local<v8::Function> Alert::Init() {
   return scope.Escape(cons);
 }
 
+v8::Local<v8::Object> Alert::GetCategories() {
+  Nan::EscapableHandleScope scope;
+  v8::Local<v8::Object> categories = Nan::New<v8::Object>();
+
+  SET_INTEGER(categories, "ERROR_NOTIFICATION", libtorrent::alert::error_notification);
+  SET_INTEGER(categories, "PEER_NOTIFICATION", libtorrent::alert::peer_notification);
+  SET_INTEGER(categories, "PORT_MAPPING_NOTIFICATION", libtorrent::alert::port_mapping_notification);
+  SET_INTEGER(categories, "STORAGE_NOTIFICATION", libtorrent::alert::storage_notification);
+  SET_INTEGER(categories, "TRACKER_NOTIFICATION", libtorrent::alert::tracker_notification);
+  SET_INTEGER(categories, "DEBUG_NOTIFICATION", libtorrent::alert::debug_notification);
+  SET_INTEGER(categories, "STATUS_NOTIFICATION", libtorrent::alert::status_notification);
+  SET_INTEGER(categories, "PROGRESS_NOTIFICATION", libtorrent::alert::progress_notification);
+  SET_INTEGER(categories, "IP_BLOCK_NOTIFICATION", libtorrent::alert::ip_block_notification);
+  SET_INTEGER(categories, "PERFORMANCE_WARNING", libtorrent::alert::performance_warning);
+  SET_INTEGER(categories, "DHT_NOTIFICATION", libtorrent::alert::dht_notification);
+  SET_INTEGER(categories, "STATS_NOTIFICATION", libtorrent::alert::stats_notification);
+  SET_INTEGER(categories, "SESSION_LOG_NOTIFICATION", libtorrent::alert::session_log_notification);
+  SET_INTEGER(categories, "TORRENT_LOG_NOTIFICATION", libtorrent::alert::torrent_log_notification);
+  SET_INTEGER(categories, "PEER_LOG_NOTIFICATION", libtorrent::alert::peer_log_notification);
+  SET_INTEGER(categories, "INCOMING_REQUEST_NOTIFICATION", libtorrent::alert::incoming_request_notification);
+  SET_INTEGER(categories, "DHT_LOG_NOTIFICATION", libtorrent::alert::dht_log_notification);
+  SET_INTEGER(categories, "DHT_OPERATION_NOTIFICATION", libtorrent::alert::dht_operation_notification);
+  SET_INTEGER(categories, "PORT_MAPPING_LOG_NOTIFICATION", libtorrent::alert::port_mapping_log_notification);
+  SET_INTEGER(categories, "PICKER_LOG_NOTIFICATION", libtorrent::alert::picker_log_notification);
+  SET_INTEGER(categories, "ALL", libtorrent::alert::all_categories);
+
+  return scope.Escape(categories);
+}
+
 v8::Local<v8::Object> Alert::FromAlertPointer(libtorrent::alert* alert) {
   Nan::EscapableHandleScope scope;
 
