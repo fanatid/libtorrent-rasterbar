@@ -13,13 +13,14 @@ class Session : public Nan::ObjectWrap {
   static v8::Local<v8::Function> Init();
 
   boost::shared_ptr<libtorrent::session> session;
-  Nan::Persistent<v8::Function> fnAlertNotify;
+  Nan::Callback fnAlertNotify;
 
  private:
   explicit Session(boost::shared_ptr<libtorrent::session> session) : session(session) {};
 
   static NAN_METHOD(New);
 
+  static NAN_METHOD(Abort);
   static NAN_METHOD(AddTorrent);
   static NAN_METHOD(AsyncAddTorrent);
 #ifndef TORRENT_DISABLE_EXTENSIONS

@@ -24,6 +24,7 @@ v8::Local<v8::Function> Session::Init() {
   tpl->SetClassName(Nan::New("Session").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
+  Nan::SetPrototypeMethod(tpl, "abort", Abort);
   Nan::SetPrototypeMethod(tpl, "addTorrent", AddTorrent);
   Nan::SetPrototypeMethod(tpl, "asyncAddTorrent", AsyncAddTorrent);
 #ifndef TORRENT_DISABLE_EXTENSIONS
@@ -61,6 +62,31 @@ NAN_METHOD(Session::New) {
   Session* obj = new Session(session);
   obj->Wrap(info.This());
   info.GetReturnValue().Set(info.This());
+}
+
+class AsyncAbort : public Nan::AsyncWorker {
+ public:
+  boost::shared_ptr<libtorrent::session> session;
+
+  explicit AsyncAbort(boost::shared_ptr<libtorrent::session> session, v8::Local<v8::Function> fn)
+      : Nan::AsyncWorker(new Nan::Callback(fn)), session(session) {}
+
+  void Execute() {
+    // create `session_proxy` and wait `session` thread termination in destructor
+    session->abort();
+  }
+
+  void HandleOKCallback() {
+    v8::Local<v8::Value> argv[] = { Nan::Null() };
+    callback->Call(1, argv);
+  }
+};
+
+NAN_METHOD(Session::Abort) {
+  ARGUMENTS_REQUIRE_FUNCTION(0, callback);
+
+  Session* obj = Nan::ObjectWrap::Unwrap<Session>(info.Holder());
+  AsyncQueueWorker(new AsyncAbort(obj->session, callback));
 }
 
 NAN_METHOD(Session::AddTorrent) {
@@ -138,9 +164,8 @@ NAN_METHOD(Session::PopAlerts) {
 void AlertNotify(Session* obj) {
   Nan::HandleScope scope;
 
-  v8::Local<v8::Function> callback = Nan::New<v8::Function>(obj->fnAlertNotify);
-  v8::Local<v8::Value> argv[0] = {};
-  Nan::MakeCallback(Nan::Undefined()->ToObject(), callback, 0, argv);
+  v8::Local<v8::Value> argv[] = { Nan::Null() };
+  obj->fnAlertNotify(1, argv);
 }
 
 NAN_METHOD(Session::SetAlertNotify) {
