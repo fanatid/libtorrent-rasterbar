@@ -27,6 +27,9 @@ v8::Local<v8::Function> Session::Init() {
   Nan::SetPrototypeMethod(tpl, "abort", Abort);
   Nan::SetPrototypeMethod(tpl, "addTorrent", AddTorrent);
   Nan::SetPrototypeMethod(tpl, "asyncAddTorrent", AsyncAddTorrent);
+  Nan::SetPrototypeMethod(tpl, "resume", Resume);
+  Nan::SetPrototypeMethod(tpl, "pause", Pause);
+  Nan::SetPrototypeMethod(tpl, "isPaused", IsPaused);
 #ifndef TORRENT_DISABLE_EXTENSIONS
   Nan::SetPrototypeMethod(tpl, "addExtension", AddExtension);
 #endif // TORRENT_DISABLE_EXTENSIONS
@@ -70,7 +73,7 @@ class AsyncAbort : public Nan::AsyncWorker {
  public:
   boost::shared_ptr<libtorrent::session> session;
 
-  explicit AsyncAbort(boost::shared_ptr<libtorrent::session> session, v8::Local<v8::Function> fn)
+  explicit AsyncAbort(v8::Local<v8::Function> fn, boost::shared_ptr<libtorrent::session> session)
       : Nan::AsyncWorker(new Nan::Callback(fn)), session(session) {}
 
   void Execute() {
@@ -88,7 +91,7 @@ NAN_METHOD(Session::Abort) {
   ARGUMENTS_REQUIRE_FUNCTION(0, callback);
 
   Session* obj = Nan::ObjectWrap::Unwrap<Session>(info.Holder());
-  AsyncQueueWorker(new AsyncAbort(obj->session, callback));
+  AsyncQueueWorker(new AsyncAbort(callback, obj->session));
 }
 
 NAN_METHOD(Session::AddTorrent) {
@@ -115,6 +118,22 @@ NAN_METHOD(Session::AsyncAddTorrent) {
   if (AddTorrentParamsFromObject(arg0, p) != 0) return;
 
   obj->session->async_add_torrent(p);
+}
+
+NAN_METHOD(Session::Resume) {
+  Session* obj = Nan::ObjectWrap::Unwrap<Session>(info.Holder());
+  obj->session->resume();
+}
+
+NAN_METHOD(Session::Pause) {
+  Session* obj = Nan::ObjectWrap::Unwrap<Session>(info.Holder());
+  obj->session->pause();
+}
+
+NAN_METHOD(Session::IsPaused) {
+  Session* obj = Nan::ObjectWrap::Unwrap<Session>(info.Holder());
+  bool paused = obj->session->is_paused();
+  info.GetReturnValue().Set(Nan::New<v8::Boolean>(paused));
 }
 
 #ifndef TORRENT_DISABLE_EXTENSIONS

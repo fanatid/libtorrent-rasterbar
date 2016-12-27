@@ -23,6 +23,9 @@ class Session : public Nan::ObjectWrap {
   static NAN_METHOD(Abort);
   static NAN_METHOD(AddTorrent);
   static NAN_METHOD(AsyncAddTorrent);
+  static NAN_METHOD(Resume);
+  static NAN_METHOD(Pause);
+  static NAN_METHOD(IsPaused);
 #ifndef TORRENT_DISABLE_EXTENSIONS
   static NAN_METHOD(AddExtension);
 #endif // TORRENT_DISABLE_EXTENSIONS
