@@ -165,6 +165,7 @@ NAN_METHOD(Session::AddExtension) {
 #endif // TORRENT_DISABLE_EXTENSIONS
 
 NAN_METHOD(Session::PopAlerts) {
+  // TODO: remove count -- it's useless
   ARGUMENTS_REQUIRE_NUMBER(0, count);
   if (count == 0) return Nan::ThrowRangeError("Argument 0 must be more than zero");
 

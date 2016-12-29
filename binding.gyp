@@ -16,6 +16,7 @@
 
       './src/add_torrent_params.cc',
       './src/alert.cc',
+      './src/bencoding.cc',
       './src/extensions.cc',
       './src/session.cc',
       './src/settings.cc',

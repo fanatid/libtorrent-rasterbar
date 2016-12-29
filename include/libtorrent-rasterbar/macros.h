@@ -1,6 +1,11 @@
 #ifndef LIBTORRENT_RASTERBAR_MACROS_H_
 #define LIBTORRENT_RASTERBAR_MACROS_H_
 
+#define REQUIRE_ARGUMENTS(n)                                                  \
+  if (info.Length() < (n)) {                                                  \
+    return Nan::ThrowTypeError("Expected " #n "arguments");                   \
+  }
+
 #define ARGUMENTS_OPTIONAL_OBJECT(i, var, defaultValue)                       \
   v8::Local<v8::Object> var;                                                  \
   if (info.Length() > i && !info[i]->IsUndefined()) {                         \
@@ -48,8 +53,11 @@
   }                                                                           \
   v8::Local<v8::Function> var = v8::Local<v8::Function>::Cast(info[i]);
 
+#define ARGUMENTS_IS_OBJECT(i)                                               \
+  (info.Length() >= (i) && info[i]->IsObject())
+
 #define ARGUMENTS_IS_INSTANCE(i, cls)                                         \
-  (info.Length() >= (i) && info[i]->IsObject() && Nan::New(cls::prototype)->HasInstance(info[i]))
+  (ARGUMENTS_IS_OBJECT(i) && Nan::New(cls::prototype)->HasInstance(info[i]))
 
 #define ARGUMENTS_REQUIRE_INSTANCE(i, cls, var)                               \
   if (!ARGUMENTS_IS_INSTANCE(i, cls)) {                                       \

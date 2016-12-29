@@ -2,6 +2,7 @@
 #include <libtorrent/version.hpp>
 #include <libtorrent-rasterbar/add_torrent_params.h>
 #include <libtorrent-rasterbar/alert.h>
+#include <libtorrent-rasterbar/bencoding.h>
 #include <libtorrent-rasterbar/extensions.h>
 #include <libtorrent-rasterbar/session.h>
 #include <libtorrent-rasterbar/settings.h>
@@ -17,6 +18,13 @@ NAN_MODULE_INIT(InitAlerts) {
   Alert::Init();
   SET_VALUE(alerts, "categories", Alert::GetCategories());
   SET_VALUE(target, "alerts", alerts);
+}
+
+NAN_MODULE_INIT(InitBencoding) {
+  v8::Local<v8::Object> bencoding = Nan::New<v8::Object>();
+  SET_FUNCTION(bencoding, "encode", BEncode);
+  SET_FUNCTION(bencoding, "decode", BDecode);
+  SET_VALUE(target, "bencoding", bencoding);
 }
 
 NAN_MODULE_INIT(InitExtensions) {
@@ -85,6 +93,7 @@ NAN_MODULE_INIT(Init) {
   Nan::HandleScope scope; // HandleScope for initialization
 
   InitAlerts(target);
+  InitBencoding(target);
   InitExtensions(target);
   InitSession(target);
   InitSettings(target);

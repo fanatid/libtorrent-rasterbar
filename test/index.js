@@ -1,6 +1,7 @@
 'use strict'
 const spawnSync = require('child_process').spawnSync
 const DEFAULT_FILENAMES = [
+  'bencoding',
   'session',
   'session_addextension',
   'session_addtorrent',
