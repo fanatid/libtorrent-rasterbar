@@ -5,9 +5,9 @@ test('Session#popAlerts', (t) => {
   const libtorrent = require('../')
   const Session = libtorrent.Session
 
-  t.test('pop 1 alert', (t) => {
+  t.test('should return empty array', (t) => {
     const s = new Session()
-    t.deepEqual(s.popAlerts(1), [])
+    t.deepEqual(s.popAlerts(), [])
 
     t.end()
   })

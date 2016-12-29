@@ -165,12 +165,8 @@ NAN_METHOD(Session::AddExtension) {
 #endif // TORRENT_DISABLE_EXTENSIONS
 
 NAN_METHOD(Session::PopAlerts) {
-  // TODO: remove count -- it's useless
-  ARGUMENTS_REQUIRE_NUMBER(0, count);
-  if (count == 0) return Nan::ThrowRangeError("Argument 0 must be more than zero");
-
   Session* obj = Nan::ObjectWrap::Unwrap<Session>(info.Holder());
-  std::vector<libtorrent::alert*> alerts(count);
+  std::vector<libtorrent::alert*> alerts;
   // TODO: mark previous created Alert as not valid
   // At least we should remove pointers!
   obj->session->pop_alerts(&alerts);
