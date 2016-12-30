@@ -25,6 +25,36 @@ v8::Local<v8::Function> SettingsPack::Init() {
   return scope.Escape(cons);
 }
 
+v8::Local<v8::Object> SettingsPack::GetStringSettingsInfo() {
+  Nan::EscapableHandleScope scope;
+
+  v8::Local<v8::Object> data = Nan::New<v8::Object>();
+  SET_INTEGER(data, "offset", 0x0000);
+  SET_INTEGER(data, "count", libtorrent::settings_pack::num_string_settings);
+
+  return scope.Escape(data);
+}
+
+v8::Local<v8::Object> SettingsPack::GetNumberSettingsInfo() {
+  Nan::EscapableHandleScope scope;
+
+  v8::Local<v8::Object> data = Nan::New<v8::Object>();
+  SET_INTEGER(data, "offset", 0x4000);
+  SET_INTEGER(data, "count", libtorrent::settings_pack::num_int_settings);
+
+  return scope.Escape(data);
+}
+
+v8::Local<v8::Object> SettingsPack::GetBooleanSettingsInfo() {
+  Nan::EscapableHandleScope scope;
+
+  v8::Local<v8::Object> data = Nan::New<v8::Object>();
+  SET_INTEGER(data, "offset", 0x8000);
+  SET_INTEGER(data, "count", libtorrent::settings_pack::num_bool_settings);
+
+  return scope.Escape(data);
+}
+
 NAN_METHOD(SettingsPack::New) {
   if (!info.IsConstructCall()) return;
 

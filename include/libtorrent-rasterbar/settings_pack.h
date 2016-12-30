@@ -12,6 +12,10 @@ class SettingsPack : public Nan::ObjectWrap {
   static Nan::Persistent<v8::Function> constructor;
   static v8::Local<v8::Function> Init();
 
+  static v8::Local<v8::Object> GetStringSettingsInfo();
+  static v8::Local<v8::Object> GetNumberSettingsInfo();
+  static v8::Local<v8::Object> GetBooleanSettingsInfo();
+
   libtorrent::settings_pack pack;
 
  private:

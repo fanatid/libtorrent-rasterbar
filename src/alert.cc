@@ -1,5 +1,6 @@
 #include <libtorrent-rasterbar/alert.h>
 #include <libtorrent-rasterbar/macros.h>
+#include <libtorrent/alert_types.hpp>
 
 namespace libtorrent_rasterbar {
 
@@ -25,6 +26,104 @@ v8::Local<v8::Function> Alert::Init() {
   Alert::constructor.Reset(cons);
 
   return scope.Escape(cons);
+}
+
+v8::Local<v8::Object> Alert::GetTypes() {
+  Nan::EscapableHandleScope scope;
+  v8::Local<v8::Object> types = Nan::New<v8::Object>();
+
+  SET_INTEGER(types, "TORRENT_ALERT", libtorrent::torrent_alert::alert_type);
+  SET_INTEGER(types, "PEER_ALERT", libtorrent::peer_alert::alert_type);
+  SET_INTEGER(types, "TRACKER_ALERT", libtorrent::tracker_alert::alert_type);
+  SET_INTEGER(types, "TORRENT_ADDED_ALERT", libtorrent::torrent_added_alert::alert_type);
+  SET_INTEGER(types, "TORRENT_REMOVED_ALERT", libtorrent::torrent_removed_alert::alert_type);
+  SET_INTEGER(types, "READ_PIECE_ALERT", libtorrent::read_piece_alert::alert_type);
+  SET_INTEGER(types, "FILE_COMPLETED_ALERT", libtorrent::file_completed_alert::alert_type);
+  SET_INTEGER(types, "FILE_RENAMED_ALERT", libtorrent::file_renamed_alert::alert_type);
+  SET_INTEGER(types, "FILE_RENAME_FAILED_ALERT", libtorrent::file_rename_failed_alert::alert_type);
+  SET_INTEGER(types, "PERFORMANCE_ALERT", libtorrent::performance_alert::alert_type);
+  SET_INTEGER(types, "STATE_CHANGED_ALERT", libtorrent::state_changed_alert::alert_type);
+  SET_INTEGER(types, "TRAKCER_ERROR_ALERT", libtorrent::tracker_error_alert::alert_type);
+  SET_INTEGER(types, "TRACKER_WARNING_ALERT", libtorrent::tracker_warning_alert::alert_type);
+  SET_INTEGER(types, "SCARPE_REPLY_ALERT", libtorrent::scrape_reply_alert::alert_type);
+  SET_INTEGER(types, "SCARPE_FAILED_ALERT", libtorrent::scrape_failed_alert::alert_type);
+  SET_INTEGER(types, "TRACKER_REPLY_ALERT", libtorrent::tracker_reply_alert::alert_type);
+  SET_INTEGER(types, "DHT_REPLY_ALERT", libtorrent::dht_reply_alert::alert_type);
+  SET_INTEGER(types, "TRACKER_ANNOUNCE_ALERT", libtorrent::tracker_announce_alert::alert_type);
+  SET_INTEGER(types, "HASH_FAILED_ALERT", libtorrent::hash_failed_alert::alert_type);
+  SET_INTEGER(types, "PEER_BAN_ALERT", libtorrent::peer_ban_alert::alert_type);
+  SET_INTEGER(types, "PEER_UNSNUBBED_ALERT", libtorrent::peer_unsnubbed_alert::alert_type);
+  SET_INTEGER(types, "PEER_SNUBBED_ALERT", libtorrent::peer_snubbed_alert::alert_type);
+  SET_INTEGER(types, "PEER_ERROR_ALERT", libtorrent::peer_error_alert::alert_type);
+  SET_INTEGER(types, "PEER_CONNECT_ALERT", libtorrent::peer_connect_alert::alert_type);
+  SET_INTEGER(types, "PEER_DISCONNECTED_ALERT", libtorrent::peer_disconnected_alert::alert_type);
+  SET_INTEGER(types, "INVALID_REQUEST_ALERT", libtorrent::invalid_request_alert::alert_type);
+  SET_INTEGER(types, "TORRENT_FINISHED_ALERT", libtorrent::torrent_finished_alert::alert_type);
+  SET_INTEGER(types, "PIECE_FINISHED_ALERT", libtorrent::piece_finished_alert::alert_type);
+  SET_INTEGER(types, "REQUEST_DROPPED_ALERT", libtorrent::request_dropped_alert::alert_type);
+  SET_INTEGER(types, "BLOCK_TIMEOUT_ALERT", libtorrent::block_timeout_alert::alert_type);
+  SET_INTEGER(types, "BLOCK_FINISHED_ALERT", libtorrent::block_finished_alert::alert_type);
+  SET_INTEGER(types, "BLOCK_DOWNLOADING_ALERT", libtorrent::block_downloading_alert::alert_type);
+  SET_INTEGER(types, "UNWANTED_BLOCK_ALERT", libtorrent::unwanted_block_alert::alert_type);
+  SET_INTEGER(types, "STORAGE_MOVED_ALERT", libtorrent::storage_moved_alert::alert_type);
+  SET_INTEGER(types, "STORAGE_MOVED_FAILED_ALERT", libtorrent::storage_moved_failed_alert::alert_type);
+  SET_INTEGER(types, "TORRENT_DELETED_ALERT", libtorrent::torrent_deleted_alert::alert_type);
+  SET_INTEGER(types, "TORRENT_DELETE_FAILED_ALERT", libtorrent::torrent_delete_failed_alert::alert_type);
+  SET_INTEGER(types, "SAVE_RESUME_DATA_ALERT", libtorrent::save_resume_data_alert::alert_type);
+  SET_INTEGER(types, "SAVE_RESUME_DATA_FAILED_ALERT", libtorrent::save_resume_data_failed_alert::alert_type);
+  SET_INTEGER(types, "TORRENT_PAUSED_ALERT", libtorrent::torrent_paused_alert::alert_type);
+  SET_INTEGER(types, "TORRENT_RESUMED_ALERT", libtorrent::torrent_resumed_alert::alert_type);
+  SET_INTEGER(types, "TORRENT_CHECKED_ALERT", libtorrent::torrent_checked_alert::alert_type);
+  SET_INTEGER(types, "URL_SEED_ALERT", libtorrent::url_seed_alert::alert_type);
+  SET_INTEGER(types, "FILE_ERROR_ALERT", libtorrent::file_error_alert::alert_type);
+  SET_INTEGER(types, "METADATA_FAILED_ALERT", libtorrent::metadata_failed_alert::alert_type);
+  SET_INTEGER(types, "METADATA_RECEIVED_ALERT", libtorrent::metadata_received_alert::alert_type);
+  SET_INTEGER(types, "UDP_ERROR_ALERT", libtorrent::udp_error_alert::alert_type);
+  SET_INTEGER(types, "EXTERNAL_IP_ALERT", libtorrent::external_ip_alert::alert_type);
+  SET_INTEGER(types, "LISTEN_FAILED_ALERT", libtorrent::listen_failed_alert::alert_type);
+  SET_INTEGER(types, "LISTEN_SUCCEEDED_ALERT", libtorrent::listen_succeeded_alert::alert_type);
+  SET_INTEGER(types, "PORTMAP_ERROR_ALERT", libtorrent::portmap_error_alert::alert_type);
+  SET_INTEGER(types, "PROTMAP_ALERT", libtorrent::portmap_alert::alert_type);
+  // SET_INTEGER(types, "PORTMAP_LOG_ALERT", libtorrent::portmap_log_alert::alert_type);
+  SET_INTEGER(types, "FASTRESUME_REJECTED_ALERT", libtorrent::fastresume_rejected_alert::alert_type);
+  SET_INTEGER(types, "PEER_BLOCKED_ALERT", libtorrent::peer_blocked_alert::alert_type);
+  SET_INTEGER(types, "DHT_ANNOUNCE_ALERT", libtorrent::dht_announce_alert::alert_type);
+  SET_INTEGER(types, "DHT_GET_PEERS_ALERT", libtorrent::dht_get_peers_alert::alert_type);
+  SET_INTEGER(types, "STATS_ALERT", libtorrent::stats_alert::alert_type);
+  SET_INTEGER(types, "CACHE_FLUSHED_ALERT", libtorrent::cache_flushed_alert::alert_type);
+  SET_INTEGER(types, "ANONYMOUS_MODE_ALERT", libtorrent::anonymous_mode_alert::alert_type);
+  SET_INTEGER(types, "LSD_PEER_ALERT", libtorrent::lsd_peer_alert::alert_type);
+  SET_INTEGER(types, "TRACKERID_ALERT", libtorrent::trackerid_alert::alert_type);
+  SET_INTEGER(types, "DHT_BOOTSTRAP_ALERT", libtorrent::dht_bootstrap_alert::alert_type);
+  // SET_INTEGER(types, "RSS_ALERT", libtorrent::rss_alert::alert_type);
+  SET_INTEGER(types, "TORRENT_ERROR_ALERT", libtorrent::torrent_error_alert::alert_type);
+  SET_INTEGER(types, "TORRENT_NEED_CERT_ALERT", libtorrent::torrent_need_cert_alert::alert_type);
+  SET_INTEGER(types, "INCOMING_CONNECTION_ALERT", libtorrent::incoming_connection_alert::alert_type);
+  SET_INTEGER(types, "ADD_TORRENT_ALERT", libtorrent::add_torrent_alert::alert_type);
+  SET_INTEGER(types, "STATE_UPDATE_ALERT", libtorrent::state_update_alert::alert_type);
+  SET_INTEGER(types, "MMAP_CACHE_ALERT", libtorrent::mmap_cache_alert::alert_type);
+  SET_INTEGER(types, "SESSION_STATS_ALERT", libtorrent::session_stats_alert::alert_type);
+  SET_INTEGER(types, "TORRENT_UPDATE_ALERT", libtorrent::torrent_update_alert::alert_type);
+  // SET_INTEGER(types, "RSS_ITEM_ALERT", libtorrent::rss_item_alert::alert_type);
+  SET_INTEGER(types, "DHT_ERROR_ALERT", libtorrent::dht_error_alert::alert_type);
+  SET_INTEGER(types, "DHT_IMMUTABLE_ITEM_ALERT", libtorrent::dht_immutable_item_alert::alert_type);
+  SET_INTEGER(types, "DHT_MUTABLE_ITEM_ALERT", libtorrent::dht_mutable_item_alert::alert_type);
+  SET_INTEGER(types, "DHT_PUT_ALERT", libtorrent::dht_put_alert::alert_type);
+  SET_INTEGER(types, "I2P_ALERT", libtorrent::i2p_alert::alert_type);
+  SET_INTEGER(types, "DHT_OUTGOING_GET_PEERS_ALERT", libtorrent::dht_outgoing_get_peers_alert::alert_type);
+  // SET_INTEGER(types, "LOG_ALERT", libtorrent::log_alert::alert_type);
+  // SET_INTEGER(types, "TORRENT_LOG_ALERT", libtorrent::torrent_log_alert::alert_type);
+  // SET_INTEGER(types, "PEER_LOG_ALERT", libtorrent::peer_log_alert::alert_type);
+  SET_INTEGER(types, "LSD_ERROR_ALERT", libtorrent::lsd_error_alert::alert_type);
+  SET_INTEGER(types, "DHT_STATS_ALERT", libtorrent::dht_stats_alert::alert_type);
+  SET_INTEGER(types, "INCOMING_REQUEST_ALERT", libtorrent::incoming_request_alert::alert_type);
+  SET_INTEGER(types, "DHT_LOG_ALERT", libtorrent::dht_log_alert::alert_type);
+  SET_INTEGER(types, "DHT_PKT_ALERT", libtorrent::dht_pkt_alert::alert_type);
+  SET_INTEGER(types, "DHT_GET_PEERS_REPLY_ALERT", libtorrent::dht_get_peers_reply_alert::alert_type);
+  SET_INTEGER(types, "DHT_DIRECT_RESPONSE_ALERT", libtorrent::dht_direct_response_alert::alert_type);
+  SET_INTEGER(types, "PICKER_LOG_ALERT", libtorrent::picker_log_alert::alert_type);
+
+  return scope.Escape(types);
 }
 
 v8::Local<v8::Object> Alert::GetCategories() {

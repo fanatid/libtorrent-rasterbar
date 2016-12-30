@@ -99,7 +99,7 @@ NAN_METHOD(Session::AddTorrent) {
 
   ARGUMENTS_OPTIONAL_OBJECT(0, arg0, Nan::New<v8::Object>());
   libtorrent::add_torrent_params p;
-  if (AddTorrentParamsFromObject(arg0, p) != 0) return;
+  if (ObjectToAddTorrentParams(arg0, p) != 0) return;
 
   boost::system::error_code ec;
   libtorrent::torrent_handle th = obj->session->add_torrent(p, ec);
@@ -115,7 +115,7 @@ NAN_METHOD(Session::AsyncAddTorrent) {
 
   ARGUMENTS_OPTIONAL_OBJECT(0, arg0, Nan::New<v8::Object>());
   libtorrent::add_torrent_params p;
-  if (AddTorrentParamsFromObject(arg0, p) != 0) return;
+  if (ObjectToAddTorrentParams(arg0, p) != 0) return;
 
   obj->session->async_add_torrent(p);
 }

@@ -11,6 +11,9 @@
       '-Wextra',
       '-fPIC'
     ],
+    'cflags_cc!': [
+      '-fno-rtti'
+    ],
     'conditions': [
       ['OS=="win"', {
       }, {

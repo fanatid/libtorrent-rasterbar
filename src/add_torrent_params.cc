@@ -20,7 +20,7 @@
 
 namespace libtorrent_rasterbar {
 
-v8::Local<v8::Object> GetAddTorrentParamsFlags() {
+v8::Local<v8::Object> AddTorrentParamsGetFlags() {
   Nan::EscapableHandleScope scope;
   v8::Local<v8::Object> flags = Nan::New<v8::Object>();
 
@@ -45,7 +45,7 @@ v8::Local<v8::Object> GetAddTorrentParamsFlags() {
   return scope.Escape(flags);
 }
 
-int AddTorrentParamsFromObject(v8::Local<v8::Object> obj, libtorrent::add_torrent_params& p) {
+int ObjectToAddTorrentParams(v8::Local<v8::Object> obj, libtorrent::add_torrent_params& p) {
   Nan::HandleScope scope;
 
   if (HAS_KEY(obj, "ti")) {

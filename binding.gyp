@@ -21,6 +21,7 @@
       './src/session.cc',
       './src/settings.cc',
       './src/settings_pack.cc',
+      './src/storage_mode.cc',
       './src/torrent_handle.cc',
       './src/torrent_info.cc'
     ]

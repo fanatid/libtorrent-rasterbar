@@ -17,7 +17,10 @@ int BufferToBDecodeNode(v8::Local<v8::Value> buffer, libtorrent::bdecode_node& b
   return 0;
 }
 
+// TODO: remove recursion
 int ValueToEntry(v8::Local<v8::Value> value, libtorrent::entry& entry) {
+  Nan::HandleScope scope;
+
   if (value->IsNumber()) {
     entry = (libtorrent::entry::integer_type) value->IntegerValue();
   } else if (value->IsString()) {
@@ -56,6 +59,7 @@ int ValueToEntry(v8::Local<v8::Value> value, libtorrent::entry& entry) {
   return 0;
 }
 
+// TODO: remove recursion
 v8::Local<v8::Value> EntryToValue(libtorrent::entry& entry) {
   Nan::EscapableHandleScope scope;
 
@@ -105,7 +109,7 @@ NAN_METHOD(BEncode) {
 }
 
 NAN_METHOD(BDecode) {
-  if (!ARGUMENTS_IS_OBJECT(0) || !node::Buffer::HasInstance(info[0])) {
+  if (!ARGUMENTS_IS_BUFFER(0)) {
     return Nan::ThrowTypeError("Argument 0 must be a Buffer");
   }
 

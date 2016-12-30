@@ -6,7 +6,7 @@ const fs = require('fs')
 test('bencoding', (t) => {
   const libtorrent = require('../')
 
-  test('bdecode/bencode simple data', (t) => {
+  t.test('bdecode/bencode simple data', (t) => {
     // {
     //   string: 'Hello World',
     //   integer: 12345,
@@ -24,7 +24,7 @@ test('bencoding', (t) => {
     t.end()
   })
 
-  test('bdecode/bencode torrent file', (t) => {
+  t.test('bdecode/bencode torrent file', (t) => {
     const filename = path.join(__dirname, 'files', 'Fedora-Workstation-Live-x86_64-25.torrent')
     const torrent = fs.readFileSync(filename)
 
