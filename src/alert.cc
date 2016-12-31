@@ -14,16 +14,15 @@ v8::Local<v8::Function> Alert::Init() {
   tpl->SetClassName(Nan::New("Alert").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-  v8::Local<v8::ObjectTemplate> inst = tpl->InstanceTemplate();
-  Nan::SetAccessor(inst, Nan::New("timestamp").ToLocalChecked(), Alert::GetTimestamp);
-  Nan::SetAccessor(inst, Nan::New("type").ToLocalChecked(), Alert::GetType);
-  Nan::SetAccessor(inst, Nan::New("what").ToLocalChecked(), Alert::GetWhat);
-  Nan::SetAccessor(inst, Nan::New("message").ToLocalChecked(), Alert::GetMessage);
-  Nan::SetAccessor(inst, Nan::New("category").ToLocalChecked(), Alert::GetCategory);
+  Nan::SetPrototypeMethod(tpl, "timestamp", Timestamp);
+  Nan::SetPrototypeMethod(tpl, "type", Type);
+  Nan::SetPrototypeMethod(tpl, "what", What);
+  Nan::SetPrototypeMethod(tpl, "message", Message);
+  Nan::SetPrototypeMethod(tpl, "category", Category);
 
   v8::Local<v8::Function> cons = Nan::GetFunction(tpl).ToLocalChecked();
-  Alert::prototype.Reset(tpl);
-  Alert::constructor.Reset(cons);
+  prototype.Reset(tpl);
+  constructor.Reset(cons);
 
   return scope.Escape(cons);
 }
@@ -175,28 +174,28 @@ NAN_METHOD(Alert::New) {
   info.GetReturnValue().Set(info.This());
 }
 
-NAN_GETTER(Alert::GetTimestamp) {
+NAN_METHOD(Alert::Timestamp) {
   Alert* obj = Nan::ObjectWrap::Unwrap<Alert>(info.Holder());
   auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(obj->alert->timestamp().time_since_epoch()).count();
   info.GetReturnValue().Set(Nan::New<v8::Date>(ns / 1000000).ToLocalChecked());
 }
 
-NAN_GETTER(Alert::GetType) {
+NAN_METHOD(Alert::Type) {
   Alert* obj = Nan::ObjectWrap::Unwrap<Alert>(info.Holder());
   info.GetReturnValue().Set(Nan::New(obj->alert->type()));
 }
 
-NAN_GETTER(Alert::GetWhat) {
+NAN_METHOD(Alert::What) {
   Alert* obj = Nan::ObjectWrap::Unwrap<Alert>(info.Holder());
   info.GetReturnValue().Set(Nan::New(obj->alert->what()).ToLocalChecked());
 }
 
-NAN_GETTER(Alert::GetMessage) {
+NAN_METHOD(Alert::Message) {
   Alert* obj = Nan::ObjectWrap::Unwrap<Alert>(info.Holder());
   info.GetReturnValue().Set(Nan::New(obj->alert->message().c_str()).ToLocalChecked());
 }
 
-NAN_GETTER(Alert::GetCategory) {
+NAN_METHOD(Alert::Category) {
   Alert* obj = Nan::ObjectWrap::Unwrap<Alert>(info.Holder());
   info.GetReturnValue().Set(Nan::New(obj->alert->category()));
 }

@@ -13,7 +13,7 @@ test('Session#addTorrent', (t) => {
   })
 
   t.test('pass Plugin', (t) => {
-    const addon = require('./addon_test')
+    const addon = require('./bindings')('session_addextension')
     const ext = addon.createEmptyPlugin(libtorrent.extensions.Plugin)
 
     const session = new Session()

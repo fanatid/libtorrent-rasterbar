@@ -21,11 +21,11 @@ class Alert : public Nan::ObjectWrap {
  private:
   static NAN_METHOD(New);
 
-  static NAN_GETTER(GetTimestamp);
-  static NAN_GETTER(GetType);
-  static NAN_GETTER(GetWhat);
-  static NAN_GETTER(GetMessage);
-  static NAN_GETTER(GetCategory);
+  static NAN_METHOD(Timestamp);
+  static NAN_METHOD(Type);
+  static NAN_METHOD(What);
+  static NAN_METHOD(Message);
+  static NAN_METHOD(Category);
 };
 
 } // namespace libtorrent_rasterbar

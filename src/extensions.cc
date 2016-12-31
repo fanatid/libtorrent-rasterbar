@@ -15,8 +15,8 @@ v8::Local<v8::Function> Plugin::Init() {
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
   v8::Local<v8::Function> cons = Nan::GetFunction(tpl).ToLocalChecked();
-  Plugin::prototype.Reset(tpl);
-  Plugin::constructor.Reset(cons);
+  prototype.Reset(tpl);
+  constructor.Reset(cons);
 
   return scope.Escape(cons);
 }

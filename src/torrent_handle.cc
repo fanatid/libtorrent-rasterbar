@@ -16,8 +16,8 @@ v8::Local<v8::Function> TorrentHandle::Init() {
   Nan::SetPrototypeMethod(tpl, "isValid", IsValid);
 
   v8::Local<v8::Function> cons = Nan::GetFunction(tpl).ToLocalChecked();
-  TorrentHandle::prototype.Reset(tpl);
-  TorrentHandle::constructor.Reset(cons);
+  prototype.Reset(tpl);
+  constructor.Reset(cons);
 
   return scope.Escape(cons);
 }

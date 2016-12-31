@@ -14,8 +14,8 @@ v8::Local<v8::Function> TorrentInfo::Init() {
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
   v8::Local<v8::Function> cons = Nan::GetFunction(tpl).ToLocalChecked();
-  TorrentInfo::prototype.Reset(tpl);
-  TorrentInfo::constructor.Reset(cons);
+  prototype.Reset(tpl);
+  constructor.Reset(cons);
 
   return scope.Escape(cons);
 }

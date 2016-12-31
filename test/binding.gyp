@@ -9,10 +9,10 @@
   },
   'targets': [{
     'type': 'loadable_module',
-    'target_name': 'addon_test',
-    'product_name': 'addon_test',
+    'target_name': 'session_addextension',
+    'product_name': 'session_addextension',
     'sources': [
-      './addon_test.cc'
+      './session_addextension.cc'
     ]
   }]
 }

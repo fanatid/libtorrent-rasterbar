@@ -19,8 +19,8 @@ v8::Local<v8::Function> SettingsPack::Init() {
   Nan::SetPrototypeMethod(tpl, "get", Get);
 
   v8::Local<v8::Function> cons = Nan::GetFunction(tpl).ToLocalChecked();
-  SettingsPack::prototype.Reset(tpl);
-  SettingsPack::constructor.Reset(cons);
+  prototype.Reset(tpl);
+  constructor.Reset(cons);
 
   return scope.Escape(cons);
 }

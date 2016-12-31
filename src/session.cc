@@ -42,8 +42,8 @@ v8::Local<v8::Function> Session::Init() {
   SET_INTEGER(flags, "START_DEFAULT_FEATURES", libtorrent::session::start_default_features);
   SET_VALUE(cons, "flags", flags);
 
-  Session::prototype.Reset(tpl);
-  Session::constructor.Reset(cons);
+  prototype.Reset(tpl);
+  constructor.Reset(cons);
 
   return scope.Escape(cons);
 }
