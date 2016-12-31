@@ -165,6 +165,8 @@ NAN_METHOD(Session::AddExtension) {
 #endif // TORRENT_DISABLE_EXTENSIONS
 
 NAN_METHOD(Session::PopAlerts) {
+  ARGUMENTS_OPTIONAL_OBJECT(0, alerts_map, Nan::New<v8::Object>());
+
   Session* obj = Nan::ObjectWrap::Unwrap<Session>(info.Holder());
   std::vector<libtorrent::alert*> alerts;
   // TODO: mark previous created Alert as not valid
@@ -173,7 +175,7 @@ NAN_METHOD(Session::PopAlerts) {
 
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
   for (auto it = alerts.begin(); it != alerts.end(); ++it) {
-    Nan::Set(result, result->Length(), Alert::FromAlertPointer(*it));
+    Nan::Set(result, result->Length(), Alert::FromAlertPointer(*it, alerts_map));
   }
 
   info.GetReturnValue().Set(result);

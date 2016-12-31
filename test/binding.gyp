@@ -14,5 +14,12 @@
     'sources': [
       './session_addextension.cc'
     ]
+  }, {
+    'type': 'loadable_module',
+    'target_name': 'session_popalerts',
+    'product_name': 'session_popalerts',
+    'sources': [
+      './session_popalerts.cc'
+    ]
   }]
 }

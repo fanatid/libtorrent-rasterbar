@@ -16,7 +16,8 @@ namespace libtorrent_rasterbar {
 
 NAN_MODULE_INIT(InitAlerts) {
   v8::Local<v8::Object> alerts = Nan::New<v8::Object>();
-  Alert::Init();
+  SET_VALUE(alerts, "Alert", Alert::Init());
+  SET_VALUE(alerts, "alerts", Alert::GetAlerts());
   SET_VALUE(alerts, "types", Alert::GetTypes());
   SET_VALUE(alerts, "categories", Alert::GetCategories());
   SET_VALUE(target, "alerts", alerts);

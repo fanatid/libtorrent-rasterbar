@@ -1,11 +1,24 @@
 #include <libtorrent-rasterbar/alert.h>
+#include <libtorrent-rasterbar/torrent_handle.h>
 #include <libtorrent-rasterbar/macros.h>
 #include <libtorrent/alert_types.hpp>
+
+#define CREATE_ALERT(name, lt_name) \
+  v8::Local<v8::FunctionTemplate> name = Nan::New<v8::FunctionTemplate>(New ## name); \
+  name->SetClassName(Nan::New("" #name).ToLocalChecked()); \
+  name->InstanceTemplate()->SetInternalFieldCount(1); \
+  Nan::Set(alerts, libtorrent::lt_name::alert_type, Nan::GetFunction(name).ToLocalChecked());
+
+#define CREATE_ALERT_BODY(constructor) \
+  Nan::Call(Nan::New<v8::Function>(constructor), info.This(), 0, NULL); \
+  if (info.IsConstructCall()) NewAlert(info.This()); \
+  info.GetReturnValue().Set(info.This());
 
 namespace libtorrent_rasterbar {
 
 Nan::Persistent<v8::FunctionTemplate> Alert::prototype;
 Nan::Persistent<v8::Function> Alert::constructor;
+std::map<int, Nan::Persistent<v8::Function>> Alert::constructors;
 
 v8::Local<v8::Function> Alert::Init() {
   Nan::EscapableHandleScope scope;
@@ -14,17 +27,23 @@ v8::Local<v8::Function> Alert::Init() {
   tpl->SetClassName(Nan::New("Alert").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-  Nan::SetPrototypeMethod(tpl, "timestamp", Timestamp);
-  Nan::SetPrototypeMethod(tpl, "type", Type);
-  Nan::SetPrototypeMethod(tpl, "what", What);
-  Nan::SetPrototypeMethod(tpl, "message", Message);
-  Nan::SetPrototypeMethod(tpl, "category", Category);
-
   v8::Local<v8::Function> cons = Nan::GetFunction(tpl).ToLocalChecked();
   prototype.Reset(tpl);
   constructor.Reset(cons);
 
   return scope.Escape(cons);
+}
+
+v8::Local<v8::Object> Alert::GetAlerts() {
+  Nan::EscapableHandleScope scope;
+  v8::Local<v8::Object> alerts = Nan::New<v8::Object>();
+
+  CREATE_ALERT(TorrentAlert, torrent_alert);
+  constructors[libtorrent::torrent_alert::alert_type].Reset(Nan::GetFunction(TorrentAlert).ToLocalChecked());
+
+  CREATE_ALERT(TorrentAddedAlert, torrent_added_alert);
+
+  return scope.Escape(alerts);
 }
 
 v8::Local<v8::Object> Alert::GetTypes() {
@@ -154,24 +173,39 @@ v8::Local<v8::Object> Alert::GetCategories() {
   return scope.Escape(categories);
 }
 
-v8::Local<v8::Object> Alert::FromAlertPointer(libtorrent::alert* alert) {
+v8::Local<v8::Object> Alert::FromAlertPointer(libtorrent::alert* alert, v8::Local<v8::Object> alerts) {
   Nan::EscapableHandleScope scope;
 
   v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
-  v8::Local<v8::Object> result = Nan::NewInstance(cons).ToLocalChecked();
+  if (alert->type() != 0 && Nan::Has(alerts, alert->type()) == Nan::Just(true)) {
+    v8::Local<v8::Value> alert_t = Nan::Get(alerts, alert->type()).ToLocalChecked();
+    if (alert_t->IsFunction()) cons = v8::Local<v8::Function>::Cast(alert_t);
+  }
 
-  Alert* obj = Nan::ObjectWrap::Unwrap<Alert>(result);
-  obj->alert = alert;
+  v8::Local<v8::Object> result = Nan::NewInstance(cons).ToLocalChecked();
+  Nan::ObjectWrap::Unwrap<Alert>(result)->alert = alert;
 
   return scope.Escape(result);
 }
 
 NAN_METHOD(Alert::New) {
-  if (!info.IsConstructCall()) return;
-
-  Alert* obj = new Alert();
-  obj->Wrap(info.This());
+  Nan::SetMethod(info.This(), "timestamp", Timestamp);
+  Nan::SetMethod(info.This(), "type", Type);
+  Nan::SetMethod(info.This(), "what", What);
+  Nan::SetMethod(info.This(), "message", Message);
+  Nan::SetMethod(info.This(), "category", Category);
+  if (info.IsConstructCall()) NewAlert(info.This());
   info.GetReturnValue().Set(info.This());
+}
+
+NAN_METHOD(Alert::NewTorrentAlert) {
+  Nan::SetMethod(info.This(), "torrentName", TorrentName);
+  Nan::SetAccessor(info.This(), Nan::New("handle").ToLocalChecked(), GetHandle);
+  CREATE_ALERT_BODY(constructor);
+}
+
+NAN_METHOD(Alert::NewTorrentAddedAlert) {
+  CREATE_ALERT_BODY(constructors[libtorrent::torrent_alert::alert_type]);
 }
 
 NAN_METHOD(Alert::Timestamp) {
@@ -198,6 +232,18 @@ NAN_METHOD(Alert::Message) {
 NAN_METHOD(Alert::Category) {
   Alert* obj = Nan::ObjectWrap::Unwrap<Alert>(info.Holder());
   info.GetReturnValue().Set(Nan::New(obj->alert->category()));
+}
+
+NAN_METHOD(Alert::TorrentName) {
+  Alert* obj = Nan::ObjectWrap::Unwrap<Alert>(info.Holder());
+  char const* name = dynamic_cast<libtorrent::torrent_alert*>(obj->alert)->torrent_name();
+  info.GetReturnValue().Set(Nan::New(name).ToLocalChecked());
+}
+
+NAN_GETTER(Alert::GetHandle) {
+  Alert* obj = Nan::ObjectWrap::Unwrap<Alert>(info.Holder());
+  libtorrent::torrent_handle th = dynamic_cast<libtorrent::torrent_alert*>(obj->alert)->handle;
+  info.GetReturnValue().Set(TorrentHandle::FromTorrentHandle(th));
 }
 
 } // namespace libtorrent_rasterbar
